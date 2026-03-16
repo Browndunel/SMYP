@@ -19,7 +19,7 @@ help:
 # ── Installation ─────────────────────────────────────────────────────────────
 
 .PHONY: install
-install: $(VENV)/bin/activate _check_poppler
+install: $(VENV)/bin/activate
 	@echo ""
 	@echo "  Environnement prêt. Lance : make run"
 	@echo ""
@@ -31,17 +31,6 @@ $(VENV)/bin/activate: requirements.txt
 	$(PIP) install --upgrade pip --quiet
 	$(PIP) install -r requirements.txt --quiet
 	@touch $(VENV)/bin/activate
-
-.PHONY: _check_poppler
-_check_poppler:
-	@if ! command -v pdftoppm > /dev/null 2>&1; then \
-		echo ""; \
-		echo "  [!] poppler manquant — requis par pdf2image"; \
-		echo "      macOS  :  brew install poppler"; \
-		echo "      Ubuntu :  sudo apt install poppler-utils"; \
-		echo ""; \
-		exit 1; \
-	fi
 
 # ── Exécution ────────────────────────────────────────────────────────────────
 

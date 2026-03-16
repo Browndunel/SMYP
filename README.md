@@ -1,20 +1,10 @@
-# Dataset Generator — Documents administratifs français
+# SMYP Dataset — Documents administratifs français
 
 Génère un dataset synthétique de documents PDF français (factures, devis, attestations URSSAF, Kbis, RIB) avec leurs versions scan dégradé et leurs ground truth JSON.
 
 ## Prérequis système
 
-**macOS**
-```bash
-brew install poppler
-```
-
-**Ubuntu / Debian**
-```bash
-sudo apt install poppler-utils
-```
-
-> `poppler` est le seul outil externe requis. Tout le reste s'installe via le venv.
+Aucune dépendance système requise. Tout s'installe via le venv Python.
 
 ## Installation
 

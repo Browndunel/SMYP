@@ -21,7 +21,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 import numpy as np
-from pdf2image import convert_from_bytes
+import pypdfium2 as pdfium
 from tqdm import tqdm
 
 from generators import (
@@ -117,8 +117,10 @@ def _process_document(
     pdf_path.write_bytes(pdf_bytes)
 
     # 3. Conversion PDF → PIL image (première page)
-    pages = convert_from_bytes(pdf_bytes, dpi=dpi)
-    source_img = pages[0]
+    pdf_doc = pdfium.PdfDocument(pdf_bytes)
+    page = pdf_doc[0]
+    bitmap = page.render(scale=dpi / 72)
+    source_img = bitmap.to_pil()
 
     # 4. Sauvegarde PNG source (scan "parfait")
     source_png_path = out_scans / f"{base_name}_original.png"

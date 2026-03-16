@@ -29,7 +29,7 @@ generate_dataset()
             │       ├── Application du scénario (anomalies)
             │       └── Construction du PDF (fpdf2)
             │
-            ├── convert_from_bytes()  → PIL Image  (pdf2image + poppler)
+            ├── PdfDocument().render()  → PIL Image  (pypdfium2)
             │
             ├── degrade_image(img, level)  × 3 niveaux
             │

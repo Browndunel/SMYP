@@ -16,11 +16,11 @@ Chaque besoin a été évalué indépendamment avant de retenir la stack finale.
 ## Stack retenue
 
 ```
-Faker  →  fpdf2  →  pdf2image  →  Pillow
+Faker  →  fpdf2  →  pypdfium2  →  Pillow
  (1)        (2)         (3)          (4)
 ```
 
-Quatre librairies Python, aucune dépendance externe côté code (seul `poppler` est requis au niveau système pour `pdf2image`).
+Quatre librairies Python, **aucune dépendance système** — tout s'installe via `pip install -r requirements.txt`.
 
 ---
 
@@ -58,19 +58,20 @@ Faker est la référence Python pour les données synthétiques localisées. La 
 
 ---
 
-### 3. Conversion PDF → image — `pdf2image`
+### 3. Conversion PDF → image — `pypdfium2`
 
 
-| Librairie          | Qualité rendu   | API simple | Dépendances       | Verdict                            |
-| ------------------ | --------------- | ---------- | ----------------- | ---------------------------------- |
-| **pdf2image**      | haute (poppler) | ✓          | poppler (système) | ✅ retenu                           |
-| PyMuPDF (fitz)     | haute           | ✓          | binaire MuPDF     | ✗ licence AGPL                     |
-| pdfplumber         | moyen           | ✓          | pdfminer          | ✗ pas de rendu image               |
-| Wand (ImageMagick) | haute           | moyen      | ImageMagick       | ✗ politique de sécurité par défaut |
+| Librairie          | Qualité rendu | API simple | Dépendances système | Verdict                            |
+| ------------------ | ------------- | ---------- | ------------------- | ---------------------------------- |
+| **pypdfium2**      | haute         | ✓          | aucune (wheel)      | ✅ retenu                           |
+| pdf2image          | haute         | ✓          | poppler obligatoire | ✗ dépendance système               |
+| PyMuPDF (fitz)     | haute         | ✓          | binaire MuPDF       | ✗ licence AGPL                     |
+| pdfplumber         | moyen         | ✓          | pdfminer            | ✗ pas de rendu image               |
+| Wand (ImageMagick) | haute         | moyen      | ImageMagick         | ✗ politique de sécurité par défaut |
 
 
-**Pourquoi pdf2image ?**
-`pdf2image` s'appuie sur `pdftoppm` de poppler, qui est le moteur de rendu PDF le plus fidèle disponible en open source. L'API est minimaliste : `convert_from_bytes(pdf_bytes, dpi=150)` retourne directement une liste d'objets PIL. PyMuPDF aurait été une alternative solide techniquement mais son modèle de licence AGPL peut poser problème selon l'usage du dataset.
+**Pourquoi pypdfium2 ?**
+`pypdfium2` est un binding Python de PDFium (moteur de rendu de Chromium), distribué sous forme de wheel pré-compilé — **aucune dépendance système**. L'API est directe : `PdfDocument(pdf_bytes)[0].render(scale=dpi/72).to_pil()` retourne un objet PIL. C'est la seule option de la liste qui s'installe sans `brew` ni `apt`, ce qui garantit la portabilité sur tous les environnements (CI, Docker, Windows).
 
 ---
 
@@ -86,7 +87,7 @@ Faker est la référence Python pour les données synthétiques localisées. La 
 
 
 **Pourquoi Pillow ?**
-Pillow est déjà une dépendance transitive de `pdf2image`. Il fournit nativement `GaussianBlur`, `Image.rotate()` et la compression JPEG par buffer. Pour le bruit, numpy complète Pillow avec une manipulation tableau rapide. OpenCV et scikit-image auraient été surdimensionnés pour des transformations aussi ciblées.
+Pillow est déjà une dépendance directe du projet. Il fournit nativement `GaussianBlur`, `Image.rotate()` et la compression JPEG par buffer. Pour le bruit, numpy complète Pillow avec une manipulation tableau rapide. OpenCV et scikit-image auraient été surdimensionnés pour des transformations aussi ciblées.
 
 ---
 
@@ -106,7 +107,7 @@ Pillow est déjà une dépendance transitive de `pdf2image`. Il fournit nativeme
                            │ bytes PDF
                            ▼
 ┌─────────────────────────────────────────────────────────┐
-│               pdf2image + poppler                        │
+│                      pypdfium2                           │
 │  rendu haute fidélité à 150 dpi → PIL Image (RGB)        │
 └──────────────────────────┬──────────────────────────────┘
                            │ PIL Image
@@ -131,8 +132,8 @@ Pillow est déjà une dépendance transitive de `pdf2image`. Il fournit nativeme
 | -------------------- | -------------- | ------------------- | ------------------------------------------------- |
 | Données synthétiques | Faker          | mimesis             | Locale fr_FR plus riche                           |
 | Génération PDF       | fpdf2          | ReportLab           | API plus légère, pas de dépendance HTML           |
-| PDF → image          | pdf2image      | PyMuPDF             | Licence open source permissive                    |
+| PDF → image          | pypdfium2      | pdf2image           | Aucune dépendance système (wheel pré-compilé)     |
 | Dégradation          | Pillow + numpy | OpenCV              | Déjà en dépendance, suffisant pour le cas d'usage |
 
 
-La stack finale est **100 % Python**, installable en une commande (`pip install -r requirements.txt` + `brew install poppler`), et ne nécessite aucun service externe ni binaire propriétaire.
+La stack finale est **100 % Python**, installable en une seule commande (`pip install -r requirements.txt`), sans aucune dépendance système ni binaire externe.
