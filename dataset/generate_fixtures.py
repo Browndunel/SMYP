@@ -1,5 +1,5 @@
 """
-Génère 7 fixtures de test déterministes dans dataset/output/test_fixtures/.
+Génère 7 fixtures de test déterministes dans generated_dataset/output/test_fixtures/.
 
 Chaque fixture produit :
   - un fichier document (PDF ou PNG ou JPG)
@@ -36,7 +36,7 @@ from utils.faker_helpers import generate_rib_data, generate_tva_intra
 # ---------------------------------------------------------------------------
 
 YONI_SIRET = "12345678901234"
-OUTPUT_DIR = Path("dataset/output/test_fixtures")
+OUTPUT_DIR = Path("generated_dataset/output/test_fixtures")
 DPI = 150
 
 _YONI_FOURNISSEUR = {
