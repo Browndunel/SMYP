@@ -20,7 +20,7 @@ Cette commande crée un environnement virtuel isolé dans `.venv/` et installe t
 make run
 ```
 
-Génère 100 documents (20 par type) dans `dataset/` avec seed fixe.
+Génère 100 documents (20 par type) dans `generated_dataset/` avec seed fixe.
 
 ## Autres commandes
 
@@ -48,7 +48,7 @@ from utils.faker_helpers import TEAM_COMPANIES
 
 # Dataset simple (structure à plat)
 generate_dataset(
-    output_dir="dataset",
+    output_dir="generated_dataset",
     n_per_type=50,
     scenario_distribution={
         "normal": 0.50,
@@ -58,13 +58,13 @@ generate_dataset(
         "falsifie": 0.10,
     },
     degradation_levels=["low", "medium", "high"],
-    team_names=TEAM_COMPANIES,   # 20 docs équipe inclus
+    team_names=TEAM_COMPANIES,   # 30 docs équipe inclus
     seed=42,
 )
 
 # Dataset avec split train/test stratifié
 generate_dataset(
-    output_dir="dataset",
+    output_dir="generated_dataset",
     n_per_type=20,
     team_names=TEAM_COMPANIES,
     split={"train": 0.70, "test": 0.30},
@@ -76,7 +76,7 @@ generate_dataset(
 
 Structure à plat (défaut, `split=None`) :
 ```
-dataset/
+generated_dataset/
 ├── raw/            # PDFs originaux
 ├── scans/          # PNGs source + 3 niveaux de dégradation
 ├── ground_truth/   # JSON par document
@@ -86,7 +86,7 @@ dataset/
 
 Avec split train/test :
 ```
-dataset/
+generated_dataset/
 ├── train/
 │   ├── raw/
 │   ├── scans/
@@ -103,7 +103,7 @@ dataset/
 
 Fixtures de test (`make fixtures`) :
 ```
-dataset/output/test_fixtures/
+generated_dataset/output/test_fixtures/
 ├── facture_yoni_sas_propre.pdf
 ├── facture_scan_flou.png
 ├── facture_rotated_15.jpg

@@ -15,7 +15,7 @@ python generate_fixtures.py
 ## Répertoire de sortie
 
 ```
-dataset/output/test_fixtures/
+generated_dataset/output/test_fixtures/
 ├── facture_yoni_sas_propre.pdf
 ├── facture_scan_flou.png
 ├── facture_rotated_15.jpg

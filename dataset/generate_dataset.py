@@ -300,7 +300,7 @@ def generate_dataset(
         scenario_distribution:  Distribution des scénarios (somme = 1).
         degradation_levels:     Niveaux de dégradation à appliquer.
         team_names:             Noms complets de sociétés équipe (scénario S8).
-                                Quand fourni, 4 docs par type (20 total) utilisent
+                                Quand fourni, 6 docs par type (30 total) utilisent
                                 ces noms avec scénario normal.
         split:                  Ratio train/test, ex : {"train": 0.70, "test": 0.30}.
                                 Split stratifié par (type, scénario).
@@ -346,8 +346,8 @@ def generate_dataset(
     # Phase 1 : Planification des assignments (doc_type, scenario, team_names)
     # ---------------------------------------------------------------------------
 
-    # 4 docs équipe par type quand team_names est fourni (20 total sur 100)
-    team_per_type = 4 if team_names else 0
+    # 6 docs équipe par type quand team_names est fourni (30 total sur 100)
+    team_per_type = 6 if team_names else 0
 
     plan: list[dict] = []
     for doc_type in _GENERATORS:

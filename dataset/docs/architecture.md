@@ -25,15 +25,15 @@ Pour chaque document, le pipeline suit ces étapes :
 generate_dataset()
     │
     ├── Phase 1 : Planification des assignments (type, scenario, team_names)
-    │       └── 4 docs/type avec team_names si activé (scénario S8)
+    │       └── 6 docs/type avec team_names si activé (scénario S8)
     │
     ├── Phase 2 : Split stratifié (si split fourni)
     │       └── Grouper par (type, scenario) → floor(n × ratio) pour train
     │
     ├── Phase 3 : Création arborescence
-    │       ├── split=None  → dataset/raw/, scans/, ground_truth/
-    │       └── split set   → dataset/train/{raw,scans,ground_truth}/
-    │                          dataset/test/{raw,scans,ground_truth}/
+    │       ├── split=None  → generated_dataset/raw/, scans/, ground_truth/
+    │       └── split set   → generated_dataset/train/{raw,scans,ground_truth}/
+    │                          generated_dataset/test/{raw,scans,ground_truth}/
     │
     ├── Phase 4 : Génération des documents
     │   └── _process_document(doc_type, scenario)
@@ -51,7 +51,7 @@ generate_dataset()
 ### Structure de sortie avec split
 
 ```
-dataset/
+generated_dataset/
 ├── train/
 │   ├── raw/
 │   ├── scans/
@@ -66,7 +66,7 @@ dataset/
 ├── scenarios.json       # catalogue des scénarios
 └── dataset_summary.json
 
-dataset/output/test_fixtures/   ← make fixtures
+generated_dataset/output/test_fixtures/   ← make fixtures
 ├── facture_yoni_sas_propre.pdf
 ├── facture_scan_flou.png
 ├── facture_rotated_15.jpg

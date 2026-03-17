@@ -42,7 +42,7 @@ run: $(VENV)/bin/activate
 .PHONY: fixtures
 fixtures: $(VENV)/bin/activate
 	$(EXEC) generate_fixtures.py
-	@echo "→ Fixtures générées dans dataset/output/test_fixtures/"
+	@echo "→ Fixtures générées dans generated_dataset/output/test_fixtures/"
 
 # ── Nettoyage ────────────────────────────────────────────────────────────────
 
@@ -53,5 +53,5 @@ clean:
 
 .PHONY: reset
 reset: clean
-	rm -rf dataset/
+	rm -rf generated_dataset/
 	@echo "→ Dataset supprimé."
