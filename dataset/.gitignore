@@ -4,7 +4,7 @@ venv/
 env/
 
 # Generated dataset
-dataset/
+generated_dataset/
 
 # Python
 __pycache__/

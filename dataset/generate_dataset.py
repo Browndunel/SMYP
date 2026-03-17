@@ -282,7 +282,7 @@ def _compute_stats(entries: list[dict]) -> dict[str, dict]:
 # ---------------------------------------------------------------------------
 
 def generate_dataset(
-    output_dir: str | Path = "dataset",
+    output_dir: str | Path = "generated_dataset",
     n_per_type: int = 20,
     scenario_distribution: dict[str, float] | None = None,
     degradation_levels: list[str] | None = None,
@@ -520,7 +520,7 @@ def generate_dataset(
 
 if __name__ == "__main__":
     generate_dataset(
-        output_dir="dataset",
+        output_dir="generated_dataset",
         n_per_type=20,
         scenario_distribution={
             "normal": 0.50,
