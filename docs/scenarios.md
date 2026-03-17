@@ -90,3 +90,19 @@ scenario_distribution = {
 ```
 
 Le tirage est pondéré (`random.choices`) et indépendant pour chaque document. Les proportions effectives peuvent légèrement varier selon `n_per_type`.
+
+## Comportement de fallback
+
+Quand un scénario n'est pas supporté par un type de document, `_resolve_scenario()` le remplace silencieusement par le scénario le plus proche. Le ground truth JSON contient le scénario **effectivement appliqué** (après résolution), pas le scénario tiré initialement.
+
+Exemple : `rib` + `siret_incoherent` → ground truth contient `"scenario": "falsifie"`.
+
+La table de compatibilité complète est visible dans `docs/architecture.md` (section "Compatibilité des scénarios"). En résumé :
+
+| Scénario tiré | rib | facture | attestation_urssaf | kbis |
+|---------------|-----|---------|-------------------|------|
+| `siret_incoherent` | → `falsifie` | ✓ | ✓ | ✓ |
+| `date_expiree` | → `normal` | → `normal` | ✓ | → `normal` |
+| `tva_incoherente` | → `normal` | ✓ | → `normal` | → `normal` |
+
+Ce comportement est transparent pour les consommateurs du dataset : le champ `scenario` dans le JSON de ground truth reflète toujours ce qui a été réellement généré.

@@ -112,6 +112,48 @@ Pour `attestation_urssaf`, `kbis` et `rib`, les champs financiers sont neutres :
 }
 ```
 
+## `labels.csv`
+
+Fichier CSV généré à la racine du dataset (et dans chaque sous-dossier train/test si split activé). Contient une ligne par document.
+
+| Colonne | Type | Description |
+|---------|------|-------------|
+| `file_name` | string | Nom du PDF (relatif à `raw/`) |
+| `doc_type` | enum | Type de document (`facture`, `devis`, `attestation_urssaf`, `kbis`, `rib`) |
+| `is_fraud` | bool | `True` si `anomalies` est non vide |
+| `anomaly_type` | string | Codes d'anomalie séparés par `\|`, vide si cohérent (ex. `SIRET_INCOHERENT\|TVA_INCOHERENTE`) |
+| `expected_siret` | string | SIRET réel de référence (toujours celui du fournisseur) |
+| `montant_ttc` | float | Montant TTC ; `0.0` pour attestation, kbis et rib |
+| `tva_rate` | int | Taux TVA de référence ; `0` pour attestation, kbis et rib |
+| `date_expiration` | string ISO | Date d'expiration ou de validité ; vide si non applicable |
+| `degradation_level` | string | Toujours `"none"` (les PNG dégradés sont dans `scans/`, pas dans `raw/`) |
+
+## `scenarios.json`
+
+Fichier JSON généré à la racine du dataset décrivant le catalogue des scénarios utilisés lors de la génération.
+
+```json
+{
+  "generated_at": "2026-03-16T14:30:00",
+  "doc_types": ["facture", "devis", "attestation_urssaf", "kbis", "rib"],
+  "scenario_distribution_used": {
+    "normal":           0.50,
+    "siret_incoherent": 0.15,
+    "date_expiree":     0.15,
+    "tva_incoherente":  0.10,
+    "falsifie":         0.10
+  },
+  "scenarios": [
+    {
+      "name": "normal",
+      "description": "Tous les champs sont cohérents",
+      "anomalies": []
+    },
+    ...
+  ]
+}
+```
+
 ## `dataset_summary.json`
 
 Fichier récapitulatif généré à la racine du dataset :

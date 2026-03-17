@@ -80,3 +80,34 @@ Les noms de société combinent aléatoirement : un nom de base + un secteur d'a
 Les secteurs disponibles : Conseil, Informatique, Services, BTP, Commerce, Industrie, Transport, Communication, Finance, Sécurité.
 
 Les formes juridiques : SARL, SAS, EURL, SA, SASU, SNC.
+
+## Noms d'équipe (Scénario S8)
+
+```python
+from utils.faker_helpers import TEAM_COMPANIES
+```
+
+`TEAM_COMPANIES` est une liste de 7 noms fixes représentant les entreprises de l'équipe projet :
+
+```python
+TEAM_COMPANIES = [
+    "Yoni SAS",
+    "Louise Corp",
+    "Ludo & Associés",
+    "Brawn Dunel SARL",
+    "Eloic Services EURL",
+    "Loan Conseil SAS",
+    "Mathis & Co SARL",
+]
+```
+
+### Utilisation dans `generate_dataset()`
+
+```python
+from utils.faker_helpers import TEAM_COMPANIES
+generate_dataset(..., team_names=TEAM_COMPANIES)
+```
+
+Quand `team_names=TEAM_COMPANIES` est passé à `generate_dataset()`, **4 documents par type** (20 documents au total) utilisent ces noms en scénario `normal`. Cela permet d'inclure dans le dataset des documents dont les entreprises sont nommées d'après les membres de l'équipe.
+
+Les noms sont passés à `random_company_name(team_names)` et `random_person_name(team_names)`, qui les utilisent comme base plutôt que de générer un nom aléatoire.
