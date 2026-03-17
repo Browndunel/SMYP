@@ -9,6 +9,20 @@ from faker import Faker
 _fake = Faker("fr_FR")
 
 # ---------------------------------------------------------------------------
+# Noms de l'équipe (scénario S8)
+# ---------------------------------------------------------------------------
+
+TEAM_COMPANIES: list[str] = [
+    "Yoni SAS",
+    "Louise Corp",
+    "Ludo & Associés",
+    "Brawn Dunel SARL",
+    "Eloic Services EURL",
+    "Loan Conseil SAS",
+    "Mathis & Co SARL",
+]
+
+# ---------------------------------------------------------------------------
 # SIRET / SIREN
 # ---------------------------------------------------------------------------
 
@@ -96,12 +110,14 @@ _SECTEURS = [
 
 
 def random_company_name(team_names: list[str] | None = None) -> str:
-    """Génère un nom de société, en intégrant éventuellement un nom d'équipe."""
-    forme = random.choice(_FORMES_JURIDIQUES)
+    """Génère un nom de société.
+
+    Si team_names est fourni, retourne directement un nom choisi dans la liste
+    (les entrées sont des noms de sociétés complets, ex : "Yoni SAS").
+    """
     if team_names:
-        base = random.choice(team_names)
-        suffix = random.choice(_SECTEURS)
-        return f"{base} {suffix} {forme}"
+        return random.choice(team_names)
+    forme = random.choice(_FORMES_JURIDIQUES)
     return f"{_fake.last_name()} {random.choice(_SECTEURS)} {forme}"
 
 

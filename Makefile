@@ -11,7 +11,8 @@ EXEC    := $(VENV)/bin/python
 help:
 	@echo ""
 	@echo "  make install   Crée le venv et installe les dépendances"
-	@echo "  make run       Lance la génération du dataset"
+	@echo "  make run       Lance la génération du dataset (100 docs)"
+	@echo "  make fixtures  Génère les 7 fixtures de test déterministes"
 	@echo "  make clean     Supprime le venv"
 	@echo "  make reset     Supprime le venv + le dataset généré"
 	@echo ""
@@ -37,6 +38,11 @@ $(VENV)/bin/activate: requirements.txt
 .PHONY: run
 run: $(VENV)/bin/activate
 	$(EXEC) generate_dataset.py
+
+.PHONY: fixtures
+fixtures: $(VENV)/bin/activate
+	$(EXEC) generate_fixtures.py
+	@echo "→ Fixtures générées dans dataset/output/test_fixtures/"
 
 # ── Nettoyage ────────────────────────────────────────────────────────────────
 
