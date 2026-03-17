@@ -137,6 +137,7 @@ Chaque document produit 5 fichiers :
 |---------|---------|
 | [`docs/benchmark.md`](docs/benchmark.md) | Choix de la stack technique, comparatif des alternatives |
 | [`docs/architecture.md`](docs/architecture.md) | Flux de génération, interface des modules, compatibilité scénarios |
+| [`docs/fixtures.md`](docs/fixtures.md) | Description des 7 fixtures de test déterministes |
 | [`docs/scenarios.md`](docs/scenarios.md) | Détail des 5 scénarios et logique de détection des anomalies |
 | [`docs/ground_truth.md`](docs/ground_truth.md) | Schéma JSON complet, description de chaque champ |
 | [`docs/degradation.md`](docs/degradation.md) | Pipeline de dégradation, paramètres par niveau |
