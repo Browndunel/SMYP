@@ -8,7 +8,7 @@ exports.Upload = async (fileBuffer, originalFileName) => {
   const form = new FormData();
   form.append("document", fileBuffer, originalFileName);
 
-  const ocrApiUrl = process.env.OCR_API_URL;
+  // const ocrApiUrl = process.env.OCR_API_URL;
 
   // const response = await axios.post(ocrApiUrl, form, {
   //   headers: {
@@ -17,11 +17,11 @@ exports.Upload = async (fileBuffer, originalFileName) => {
   // });
 
   // if (response.status != 200) {
-  //   res.status(response.status).send({
-  //     message: "Echec du traitement",
-  //     OcrApiData: response.data,
-  //   });
-  //   return;
+  //   return {
+  //     error: true,
+  //     data: response.data,
+  //     statusCode: 503,
+  //   };
   // }
 
   // const jsonRecu = response.data;
@@ -41,11 +41,44 @@ exports.Upload = async (fileBuffer, originalFileName) => {
   await nouvelleEntree.save();
 
   return {
-    id: nouvelleEntree._id,
-    dateTraitement: nouvelleEntree.dateTraitement,
-    nomFichierDOrigine: nouvelleEntree.nomFichierDOrigine,
-    donneesExtraites: nouvelleEntree.donneesExtraites,
+    error: false,
+    data: {
+      id: nouvelleEntree._id,
+      dateTraitement: nouvelleEntree.dateTraitement,
+      nomFichierDOrigine: nouvelleEntree.nomFichierDOrigine,
+      donneesExtraites: nouvelleEntree.donneesExtraites,
+    },
+    statusCode: 201,
   };
 
   // Enregistre le document dans minIO
+};
+
+exports.GetAll = async () => {
+  const document = await Document.find();
+  return {
+    error: false,
+    data: document,
+    statusCode: 200,
+  };
+};
+
+exports.Delete = async (id) => {
+  const document = await Document.findById(id);
+
+  if (!document) {
+    return {
+      error: true,
+      data: "Le document est introuvable",
+      statusCode: 404,
+    };
+  }
+
+  await Document.findByIdAndDelete(id);
+
+  return {
+    error: false,
+    data: "Suppression effectuée",
+    statusCode: 204,
+  };
 };

@@ -27,20 +27,7 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-/**
- * @openapi
- * /:
- *   get:
- *     description: Welcome message
- *     responses:
- *       200:
- *         description: Returns Hello World!
- */
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-
-app.use("/documents", require("./src/routes/documents.route"));
+app.use("/api", require("./src/routes/documents.route"));
 
 app.listen(port, () => {
   console.log(`API listening on port ${port}`);

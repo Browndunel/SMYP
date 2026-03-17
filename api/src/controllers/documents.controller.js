@@ -9,14 +9,36 @@ exports.Upload = async (req, res) => {
       req.file.buffer,
       req.file.originalName,
     );
-    return res.status(200).send({
-      message: "Fichier traité",
-      ...resultat,
-    });
+    return res.status(resultat.statusCode).send(resultat.data);
   } catch (error) {
     console.error("Erreur dans le contrôleur :", error.message);
     res.status(500).send({
       error: "Une erreur est survenue lors du traitement du document.",
+    });
+  }
+};
+
+exports.GetAll = async (req, res) => {
+  try {
+    const resultat = await documentService.GetAll();
+    return res.status(resultat.statusCode).send(resultat.data);
+  } catch (error) {
+    console.error("Erreur dans le contrôleur :", error.message);
+    res.status(500).send({
+      error: "Une erreur est survenue lors de la récupération du document.",
+    });
+  }
+};
+
+exports.Delete = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await documentService.Delete(id);
+    return res.status(result.statusCode).send(result.data);
+  } catch (error) {
+    console.error("Erreur dans le contrôleur :", error.message);
+    res.status(500).send({
+      error: "Une erreur est survenue lors de la suppression du document.",
     });
   }
 };
