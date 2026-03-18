@@ -33,7 +33,7 @@ from generators import (
     generate_kbis,
     generate_rib,
 )
-from utils.degradation import degrade_image
+from utils.degradation import degrade_image, degrade_image_smartphone
 from utils.faker_helpers import TEAM_COMPANIES
 
 # ---------------------------------------------------------------------------
@@ -188,6 +188,12 @@ def _process_document(
         scan_path = out_scans / f"{base_name}_{level}.png"
         degraded.save(scan_path, format="PNG")
         scan_files[level] = scan_path.name
+
+    # 5b. Version smartphone
+    smartphone_img = degrade_image_smartphone(source_img)
+    smartphone_path = out_scans / f"{base_name}_smartphone.jpg"
+    smartphone_img.save(smartphone_path, format="JPEG", quality=85)
+    scan_files["smartphone"] = smartphone_path.name
 
     # 6. Ground truth enrichi
     ground_truth["fichiers"] = {

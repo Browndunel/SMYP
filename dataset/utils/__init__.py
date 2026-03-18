@@ -7,7 +7,7 @@ from .faker_helpers import (
     random_address,
     random_person_name,
 )
-from .degradation import degrade_image
+from .degradation import degrade_image, degrade_image_smartphone
 
 __all__ = [
     "generate_siret",
@@ -18,4 +18,5 @@ __all__ = [
     "random_address",
     "random_person_name",
     "degrade_image",
+    "degrade_image_smartphone",
 ]

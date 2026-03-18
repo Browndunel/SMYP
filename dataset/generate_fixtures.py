@@ -1,5 +1,5 @@
 """
-Génère 7 fixtures de test déterministes dans generated_dataset/output/test_fixtures/.
+Génère 8 fixtures de test déterministes dans generated_dataset/output/test_fixtures/.
 
 Chaque fixture produit :
   - un fichier document (PDF ou PNG ou JPG)
@@ -30,6 +30,7 @@ np.random.seed(0)
 from generators.facture import _build_pdf as _build_facture_pdf
 from generators.attestation_urssaf import _build_pdf as _build_attestation_pdf
 from utils.faker_helpers import generate_rib_data, generate_tva_intra
+from utils.degradation import degrade_image_smartphone
 
 # ---------------------------------------------------------------------------
 # Constantes
@@ -117,7 +118,7 @@ def _base_facture_gt(
 # ---------------------------------------------------------------------------
 
 def generate_fixtures(output_dir: Path = OUTPUT_DIR) -> None:
-    """Génère les 7 fixtures dans output_dir. Idempotent."""
+    """Génère les 8 fixtures dans output_dir. Idempotent."""
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # ------------------------------------------------------------------
@@ -337,6 +338,20 @@ def generate_fixtures(output_dir: Path = OUTPUT_DIR) -> None:
             "numero_document": "FAC-2024-0003",
             "coherent": False,
             "anomalies": ["TVA_INCOHERENTE"],
+        },
+    )
+
+    # ------------------------------------------------------------------
+    # 8. facture_smartphone.jpg  — nominal + dégradation smartphone
+    # ------------------------------------------------------------------
+    name = "facture_smartphone"
+    smartphone_img = degrade_image_smartphone(_pdf_to_pil(pdf_bytes))
+    smartphone_img.save(output_dir / f"{name}.jpg", format="JPEG", quality=85)
+    _write_gt(
+        output_dir / f"{name}_ground_truth.json",
+        {
+            **_base_facture_gt(name, YONI_SIRET, 1000.00, 200.00, 1200.00, []),
+            "degradation": "smartphone",
         },
     )
 
