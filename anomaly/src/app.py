@@ -15,7 +15,7 @@ import json
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fraud_detector import detect
-from minio_client import client, BUCKET_CURATED
+from minio_client import client, BUCKET
 
 app = FastAPI(
     title="Anomaly Service",
@@ -84,8 +84,8 @@ async def validate(req: ValidateRequest):
 
     # Push le résultat dans smyp-curated
     data = json.dumps(result, ensure_ascii=False).encode("utf-8")
-    object_name = f"anomaly/{result['file_id']}.json"
-    client.put_object(BUCKET_CURATED, object_name, io.BytesIO(data), len(data), content_type="application/json")
+    object_name = f"curated/{result['file_id']}.json"
+    client.put_object(BUCKET, object_name, io.BytesIO(data), len(data), content_type="application/json")
 
     return result
 

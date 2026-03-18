@@ -14,14 +14,4 @@ client = Minio(
     secure=os.getenv("MINIO_SECURE", "true").lower() == "true",
 )
 
-BUCKET_RAW = "smyp-raw"
-BUCKET_CLEAN = "smyp-clean"
-BUCKET_CURATED = "smyp-curated"
-
-# Créer les buckets s'ils n'existent pas
-for bucket in [BUCKET_RAW, BUCKET_CLEAN, BUCKET_CURATED]:
-    if not client.bucket_exists(bucket):
-        client.make_bucket(bucket)
-        print(f"[MinIO] Bucket '{bucket}' créé")
-    else:
-        print(f"[MinIO] Bucket '{bucket}' OK")
+BUCKET = "symp"
