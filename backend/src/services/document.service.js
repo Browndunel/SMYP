@@ -1,8 +1,9 @@
 const axios = require("axios");
 const FormData = require("form-data");
 const Document = require("../models/document.model");
+const minioService = require("../services/minio.service");
 
-exports.Upload = async (fileBuffer, originalFileName) => {
+exports.Upload = async (fileBuffer, originalFileName, mimeType) => {
   // Renvoi les document à l'OCR et attend la réponse
 
   const form = new FormData();
@@ -26,14 +27,30 @@ exports.Upload = async (fileBuffer, originalFileName) => {
 
   // const jsonRecu = response.data;
 
-  // Sauvegarde dans MongoDB
+  // Enregistre le document dans minIO
+  try {
+    const result = await minioService.uploadFile(
+      fileBuffer,
+      originalFileName,
+      mimeType,
+    );
+    if (result.error == true) {
+      return result;
+    }
+  } catch (error) {
+    return {
+      error: true,
+      data: error,
+      statusCode: 500,
+    };
+  }
 
+  // Sauvegarde dans MongoDB
   const jsonRecu = {
     type: "Facture",
     date: "12/12/23",
     createur: "Jean Dupont",
   };
-
   const nouvelleEntree = new Document({
     nomFichierDOrigine: originalFileName,
     donneesExtraites: jsonRecu,
@@ -50,8 +67,6 @@ exports.Upload = async (fileBuffer, originalFileName) => {
     },
     statusCode: 201,
   };
-
-  // Enregistre le document dans minIO
 };
 
 exports.GetAll = async () => {

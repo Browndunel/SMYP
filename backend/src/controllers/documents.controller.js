@@ -7,7 +7,8 @@ exports.Upload = async (req, res) => {
   try {
     const resultat = await documentService.Upload(
       req.file.buffer,
-      req.file.originalName,
+      req.file.originalname,
+      req.file.mimetype,
     );
     return res.status(resultat.statusCode).send(resultat.data);
   } catch (error) {

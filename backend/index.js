@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: ".env.dev" });
 
 const express = require("express");
 const swaggerJsdoc = require("swagger-jsdoc");
@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 
 const app = express();
 
-const port = 5000;
+const port = process.env.API_PORT || 5000;
 
 mongoose
   .connect(process.env.MONGODB_URI)
