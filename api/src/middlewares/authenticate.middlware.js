@@ -5,9 +5,7 @@ const authenticate = (req, res, next) => {
 
   if (!authHeader) {
     return res.status(401).json({
-      error: true,
-      message: "Header manquant",
-      statusCode: 401,
+      error: "Header manquant",
     });
   }
 
@@ -15,9 +13,7 @@ const authenticate = (req, res, next) => {
 
   if (!token) {
     return res.status(401).json({
-      error: true,
-      message: "Token manquant",
-      statusCode: 401,
+      error: "Token manquant",
     });
   }
 
@@ -29,9 +25,7 @@ const authenticate = (req, res, next) => {
     next();
   } catch (error) {
     return res.status(403).json({
-      error: true,
-      message: "Token invalide ou expiré",
-      statusCode: 403,
+      error: "Token invalide ou expiré",
     });
   }
 };
