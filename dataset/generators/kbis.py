@@ -155,7 +155,7 @@ def generate_kbis(
     capital = random.choice([1000, 5000, 10000, 50000, 100000, 250000, 500000])
     adresse = random_address()
     code_ape, libelle_ape = random.choice(list(_CODES_APE.items()))
-    dirigeant = random_person_name(team_names)
+    dirigeant = random_person_name()
     greffe = random.choice(_GREFFES)
 
     date_extrait = date.today() - timedelta(days=random.randint(0, 30))

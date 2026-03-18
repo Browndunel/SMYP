@@ -137,7 +137,7 @@ def generate_rib(
         titulaire = random_company_name(team_names)
         siret = generate_siret()
     else:
-        titulaire = random_person_name(team_names)
+        titulaire = random_person_name()
         siret = ""
 
     adresse = random_address()

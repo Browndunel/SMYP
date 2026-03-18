@@ -26,6 +26,8 @@ from PIL import Image, ImageFilter
 # Graine fixe pour la reproductibilité (RIB aléatoire dans les fixtures)
 random.seed(0)
 np.random.seed(0)
+from faker import Faker as _Faker
+_Faker.seed(0)
 
 from generators.facture import _build_pdf as _build_facture_pdf
 from generators.attestation_urssaf import _build_pdf as _build_attestation_pdf

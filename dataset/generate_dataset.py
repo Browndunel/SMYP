@@ -344,6 +344,8 @@ def generate_dataset(
     # Initialisation des graines
     random.seed(seed)
     np.random.seed(seed)
+    from faker import Faker as _Faker
+    _Faker.seed(seed)
     rng = random.Random(seed)
 
     output_dir = Path(output_dir)

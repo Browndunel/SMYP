@@ -128,7 +128,5 @@ def random_address() -> str:
     )
 
 
-def random_person_name(team_names: list[str] | None = None) -> str:
-    if team_names:
-        return random.choice(team_names)
+def random_person_name() -> str:
     return _fake.name()
