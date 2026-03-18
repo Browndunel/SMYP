@@ -12,6 +12,6 @@ Si besoin, remplacer le contenu des variables
 
 `docker compose up --build -d`
 
-# Comment couper l'api ?
+# Comment stoper l'api ?
 
 `docker compose down`
