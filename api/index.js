@@ -21,13 +21,25 @@ const swaggerOptions = {
       title: "SMYP API",
       version: "1.0.0",
     },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
   },
   apis: ["./index.js", "./src/routes/*.js"],
 };
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+app.use(express.json());
+
 app.use("/api", require("./src/routes/documents.route"));
+app.use("/api", require("./src/routes/auth.route"));
 
 app.listen(port, () => {
   console.log(`API listening on port ${port}`);
