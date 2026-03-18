@@ -5,7 +5,7 @@
 ```
 dataset_generator/
 ├── generate_dataset.py      # Orchestrateur principal
-├── generate_fixtures.py     # Génère 7 fixtures de test déterministes
+├── generate_fixtures.py     # Génère 8 fixtures de test déterministes
 ├── generators/              # Un fichier par type de document
 │   ├── facture.py
 │   ├── devis.py
@@ -70,11 +70,12 @@ generated_dataset/output/test_fixtures/   ← make fixtures
 ├── facture_yoni_sas_propre.pdf
 ├── facture_scan_flou.png
 ├── facture_rotated_15.jpg
+├── facture_smartphone.jpg
 ├── facture_siret_mismatch.pdf
 ├── attestation_siret_different.pdf
 ├── attestation_urssaf_expiree.pdf
 ├── facture_tva_15pct.pdf
-└── *_ground_truth.json (×7)
+└── *_ground_truth.json (×8)
 ```
 
 ## Interface des générateurs

@@ -12,7 +12,7 @@ help:
 	@echo ""
 	@echo "  make install   Crée le venv et installe les dépendances"
 	@echo "  make run       Lance la génération du dataset (100 docs)"
-	@echo "  make fixtures  Génère les 7 fixtures de test déterministes"
+	@echo "  make fixtures  Génère les 8 fixtures de test déterministes"
 	@echo "  make clean     Supprime le venv"
 	@echo "  make reset     Supprime le venv + le dataset généré"
 	@echo ""

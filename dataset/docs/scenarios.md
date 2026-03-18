@@ -36,7 +36,10 @@ Sur le PDF de l'attestation, la date expirée est affichée en rouge.
 ```
 
 ### `tva_incoherente`
-Le montant de TVA affiché ne correspond pas au taux de 20 % appliqué. Un taux erroné est choisi parmi `[5%, 8%, 10%, 12%, 15%]`.
+Le montant de TVA affiché ne correspond pas au taux de 20 % appliqué. Un taux erroné est tiré aléatoirement :
+
+- **facture** : parmi `[5%, 5.5%, 8.5%, 10%, 15%]`
+- **devis** : parmi `[5%, 8%, 12%, 15%]`
 
 ```json
 {

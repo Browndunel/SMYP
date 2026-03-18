@@ -72,7 +72,6 @@ random_company_name()                        # "Dupont Conseil SARL"
 random_company_name(["Alice", "Bob"])        # "Alice Transport EURL"
 random_address()                             # "12 rue de la Paix\n75001 Paris"
 random_person_name()                         # "Jean-Pierre Martin"
-random_person_name(["Alice", "Bob"])         # "Alice"
 ```
 
 Les noms de société combinent aléatoirement : un nom de base + un secteur d'activité + une forme juridique.
@@ -110,4 +109,4 @@ generate_dataset(..., team_names=TEAM_COMPANIES)
 
 Quand `team_names=TEAM_COMPANIES` est passé à `generate_dataset()`, **6 documents par type** (30 documents au total) utilisent ces noms en scénario `normal`. Cela permet d'inclure dans le dataset des documents dont les entreprises sont nommées d'après les membres de l'équipe.
 
-Les noms sont passés à `random_company_name(team_names)` et `random_person_name(team_names)`, qui les utilisent comme base plutôt que de générer un nom aléatoire.
+Les noms sont passés à `random_company_name(team_names)`, qui les utilise comme base plutôt que de générer un nom aléatoire. `random_person_name()` génère toujours un nom de personne aléatoire via Faker.

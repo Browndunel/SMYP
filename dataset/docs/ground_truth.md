@@ -34,9 +34,10 @@
     "pdf": "facture_tva_incoherente_409db9b4.pdf",
     "png_original": "facture_tva_incoherente_409db9b4_original.png",
     "png_scans": {
-      "low":    "facture_tva_incoherente_409db9b4_low.png",
-      "medium": "facture_tva_incoherente_409db9b4_medium.png",
-      "high":   "facture_tva_incoherente_409db9b4_high.png"
+      "low":        "facture_tva_incoherente_409db9b4_low.png",
+      "medium":     "facture_tva_incoherente_409db9b4_medium.png",
+      "high":       "facture_tva_incoherente_409db9b4_high.png",
+      "smartphone": "facture_tva_incoherente_409db9b4_smartphone.jpg"
     }
   }
 }
