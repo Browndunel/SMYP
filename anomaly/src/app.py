@@ -9,9 +9,13 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
+import io
+import json
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fraud_detector import detect
+from minio_client import client, BUCKET_CURATED
 
 app = FastAPI(
     title="Anomaly Service",
@@ -77,6 +81,12 @@ class ValidateResponse(BaseModel):
 async def validate(req: ValidateRequest):
     payload = req.model_dump()
     result = detect(payload)
+
+    # Push le résultat dans smyp-curated
+    data = json.dumps(result, ensure_ascii=False).encode("utf-8")
+    object_name = f"anomaly/{result['file_id']}.json"
+    client.put_object(BUCKET_CURATED, object_name, io.BytesIO(data), len(data), content_type="application/json")
+
     return result
 
 
