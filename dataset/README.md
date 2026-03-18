@@ -25,7 +25,7 @@ Génère 100 documents (20 par type) dans `generated_dataset/` avec seed fixe.
 ## Autres commandes
 
 ```bash
-make fixtures  # Génère les 7 fixtures de test déterministes
+make fixtures  # Génère les 8 fixtures de test déterministes
 make help      # Liste les commandes disponibles
 make clean     # Supprime le venv
 make reset     # Supprime le venv + le dataset généré
@@ -107,11 +107,12 @@ generated_dataset/output/test_fixtures/
 ├── facture_yoni_sas_propre.pdf
 ├── facture_scan_flou.png
 ├── facture_rotated_15.jpg
+├── facture_smartphone.jpg
 ├── facture_siret_mismatch.pdf
 ├── attestation_siret_different.pdf
 ├── attestation_urssaf_expiree.pdf
 ├── facture_tva_15pct.pdf
-└── *_ground_truth.json  (7 fichiers)
+└── *_ground_truth.json  (8 fichiers)
 ```
 
 ### labels.csv
@@ -122,13 +123,14 @@ Colonnes : `file_name, doc_type, is_fraud, anomaly_type, expected_siret, montant
 - `is_fraud=True` si anomalies non vides
 - `anomaly_type` : codes séparés par `|` (ex : `SIRET_INCOHERENT|TVA_INCOHERENTE`)
 
-Chaque document produit 5 fichiers :
+Chaque document produit 6 fichiers :
 ```
 {type}_{scenario}_{id[:8]}.pdf
 {type}_{scenario}_{id[:8]}_original.png
 {type}_{scenario}_{id[:8]}_low.png
 {type}_{scenario}_{id[:8]}_medium.png
 {type}_{scenario}_{id[:8]}_high.png
+{type}_{scenario}_{id[:8]}_smartphone.jpg
 ```
 
 ## Documentation détaillée
@@ -137,8 +139,8 @@ Chaque document produit 5 fichiers :
 |---------|---------|
 | [`docs/benchmark.md`](docs/benchmark.md) | Choix de la stack technique, comparatif des alternatives |
 | [`docs/architecture.md`](docs/architecture.md) | Flux de génération, interface des modules, compatibilité scénarios |
-| [`docs/fixtures.md`](docs/fixtures.md) | Description des 7 fixtures de test déterministes |
+| [`docs/fixtures.md`](docs/fixtures.md) | Description des 8 fixtures de test déterministes |
 | [`docs/scenarios.md`](docs/scenarios.md) | Détail des 5 scénarios et logique de détection des anomalies |
 | [`docs/ground_truth.md`](docs/ground_truth.md) | Schéma JSON complet, description de chaque champ |
-| [`docs/degradation.md`](docs/degradation.md) | Pipeline de dégradation, paramètres par niveau |
+| [`docs/degradation.md`](docs/degradation.md) | Pipeline de dégradation scan (3 niveaux) + mode smartphone |
 | [`docs/faker_helpers.md`](docs/faker_helpers.md) | Formules SIRET, IBAN, TVA intra, helpers disponibles |
