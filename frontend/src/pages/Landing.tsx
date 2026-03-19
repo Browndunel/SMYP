@@ -221,11 +221,11 @@ export default function Landing() {
 
                   <div className="mt-10 flex flex-wrap gap-3">
                     <Button
-                      onClick={scrollToUpload}
+                      onClick={() => navigate('/dashboard')}
                       variant="default"
                       size="lg"
                     >
-                      Démarrer gratuitement
+                      Accéder à mon dashboard
                       <ArrowRight size={14} />
                     </Button>
                     {!isLoggedIn && (
