@@ -6,6 +6,7 @@ type RawDocument = Partial<Document> & {
   id?: string;
   _id?: string;
   __v?: number;
+  donneeExtraites?: unknown;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -64,6 +65,7 @@ function inferDocumentType(
     raw.type,
     raw.nomFichierDOrigine,
     raw.name,
+    extracted?.file_name,
     extracted?.filename,
     extracted?.text,
   ]
@@ -108,9 +110,26 @@ function collectFields(
 
   if (!extracted) return baseFields;
 
+  // New structure: fields nested under extracted.fields
+  if (isRecord(extracted.fields)) {
+    const nestedFields =
+      (toDocumentDataValue(extracted.fields) as Document["fields"] | undefined) ??
+      {};
+    return { ...baseFields, ...nestedFields };
+  }
+
+  // Fallback: old structure where fields were at root of extracted data
   const extractedEntries = Object.entries(extracted).filter(
     ([key, value]) =>
-      !["filename", "text", "entities"].includes(key) && value !== undefined,
+      ![
+        "filename",
+        "file_name",
+        "file_id",
+        "text",
+        "entities",
+        "ocr_confidence",
+        "classification_confidence",
+      ].includes(key) && value !== undefined,
   );
 
   return {
@@ -120,7 +139,9 @@ function collectFields(
 }
 
 function normalize(raw: RawDocument): Document {
-  const donneesExtraites = normalizeExtractedData(raw.donneesExtraites);
+  const donneesExtraites = normalizeExtractedData(
+    raw.donneeExtraites ?? raw.donneesExtraites,
+  );
   const anomalies = Array.isArray(raw.anomalies)
     ? raw.anomalies.filter((item): item is string => typeof item === "string")
     : [];
