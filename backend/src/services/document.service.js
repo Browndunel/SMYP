@@ -50,23 +50,20 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType, userId) => {
 
   let minioFileName = null;
 
-  // Enregistre le document dans minIO
+  // Enregistre le document dans minIO (non-bloquant)
   try {
     const result = await minioService.uploadFile(
       fileBuffer,
       originalFileName,
       mimeType,
     );
-    if (result.error == true) {
-      return result;
+    if (result.error !== true) {
+      minioFileName = result.data;
+    } else {
+      console.warn("MinIO upload échoué (non-bloquant):", result.data);
     }
-    minioFileName = result.data;
   } catch (error) {
-    return {
-      error: true,
-      data: error,
-      statusCode: 500,
-    };
+    console.warn("MinIO indisponible (non-bloquant):", error.message);
   }
 
   // Sauvegarde dans MongoDB

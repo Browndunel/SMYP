@@ -137,6 +137,10 @@ def run_ocr(file_path, content_type):
 async def root():
     return {"message": "Hello World"}
 
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
 @app.post("/ocr")
 async def ocr(file: UploadFile = File(...)):
 

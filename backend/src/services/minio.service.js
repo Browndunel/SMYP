@@ -1,7 +1,13 @@
 const Minio = require("minio");
 
+const rawEndpoint = process.env.MINIO_ENDPOINT || "";
+const [minioHost, minioPortStr] = rawEndpoint.includes(":")
+  ? rawEndpoint.split(":")
+  : [rawEndpoint, undefined];
+
 const minioClient = new Minio.Client({
-  endPoint: process.env.MINIO_ENDPOINT,
+  endPoint: minioHost,
+  ...(minioPortStr ? { port: parseInt(minioPortStr, 10) } : {}),
   useSSL: process.env.MINIO_SECURE === "true",
   accessKey: process.env.MINIO_ACCESS_KEY,
   secretKey: process.env.MINIO_SECRET_KEY,
