@@ -12,6 +12,7 @@ function extractMessage(err: unknown, fallback: string): string {
 export function useUpload() {
   const [files, setFiles] = useState<File[]>([])
   const [isUploading, setIsUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const { addDocuments } = useDocumentsStore()
 
@@ -31,9 +32,12 @@ export function useUpload() {
   const upload = async (): Promise<boolean> => {
     if (files.length === 0) return false
     setIsUploading(true)
+    setUploadProgress(0)
     setError(null)
     try {
-      const docs = await documentsService.uploadDocuments(files)
+      const docs = await documentsService.uploadDocuments(files, (done, total) => {
+        setUploadProgress(Math.round((done / total) * 100))
+      })
       addDocuments(docs)
       setFiles([])
       return true
@@ -42,8 +46,9 @@ export function useUpload() {
       return false
     } finally {
       setIsUploading(false)
+      setUploadProgress(0)
     }
   }
 
-  return { files, isUploading, error, addFiles, removeFile, clearFiles, upload, clearError: () => setError(null) }
+  return { files, isUploading, uploadProgress, error, addFiles, removeFile, clearFiles, upload, clearError: () => setError(null) }
 }

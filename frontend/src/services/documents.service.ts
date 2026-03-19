@@ -181,12 +181,13 @@ export const documentsService = {
     return (raw as RawDocument[]).map(normalize);
   },
 
-  async uploadDocuments(files: File[]): Promise<Document[]> {
+  async uploadDocuments(files: File[], onProgress?: (done: number, total: number) => void): Promise<Document[]> {
     const token = requireToken();
     const results: Document[] = [];
-    for (const file of files) {
-      const raw = await api.uploadDocument(file, token);
+    for (let i = 0; i < files.length; i++) {
+      const raw = await api.uploadDocument(files[i], token);
       results.push(normalize(raw as RawDocument));
+      onProgress?.(i + 1, files.length);
     }
     return results;
   },

@@ -125,7 +125,7 @@ export default function Conformite() {
                 {allAnomalies.length} alerte{allAnomalies.length > 1 ? 's' : ''} active{allAnomalies.length > 1 ? 's' : ''}
               </p>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
               {allAnomalies.map(({ document, anomaly }, i) => (
                 <div
                   key={i}
