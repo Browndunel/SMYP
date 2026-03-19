@@ -1,0 +1,177 @@
+# ============================================================
+# SMYP – docker-compose.yml
+# Brawn Dunel — Lance tout avec : docker-compose up --build -d
+# ============================================================
+
+services:
+
+  # ── 1. MongoDB (Louise) ──────────────────────────────────
+  mongodb:
+    image: mongo:7
+    container_name: smyp-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - smyp-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # ── 2. OCR Service (Ludo) ────────────────────────────────
+  ocr-service:
+    build:
+      context: ./ocr
+      dockerfile: Dockerfile
+    container_name: smyp-ocr
+    ports:
+      - "8001:8001"
+    environment:
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_BUCKET_RAW=${MINIO_BUCKET_RAW}
+      - MINIO_BUCKET_CLEAN=${MINIO_BUCKET_CLEAN}
+    volumes:
+      - ./ocr:/app
+    networks:
+      - smyp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # ── 3. Anomaly Service (Loan) ────────────────────────────
+  anomaly-service:
+    build:
+      context: ./anomaly
+      dockerfile: Dockerfile
+    container_name: smyp-anomaly
+    ports:
+      - "8002:8002"
+    environment:
+      - ANOMALY_SCORE_THRESHOLD=${ANOMALY_SCORE_THRESHOLD}
+    volumes:
+      - ./anomaly:/app
+    networks:
+      - smyp-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # ── 4. Backend Node/Express (Eloic) ──────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smyp-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_BUCKET_RAW=${MINIO_BUCKET_RAW}
+      - MINIO_BUCKET_CLEAN=${MINIO_BUCKET_CLEAN}
+      - MINIO_BUCKET_CURATED=${MINIO_BUCKET_CURATED}
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB=${MONGO_DB}
+      - MONGO_COLLECTION=${MONGO_COLLECTION}
+      - AIRFLOW_API_URL=${AIRFLOW_API_URL}
+      - AIRFLOW_USERNAME=${AIRFLOW_USERNAME}
+      - AIRFLOW_PASSWORD=${AIRFLOW_PASSWORD}
+      - OCR_SERVICE_URL=${OCR_SERVICE_URL}
+      - ANOMALY_SERVICE_URL=${ANOMALY_SERVICE_URL}
+      - BACKEND_PORT=${BACKEND_PORT}
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - smyp-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ── 5. Frontend React (Eloic) ────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: smyp-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:5000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - smyp-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+ # ── 6. Apache Airflow (Brawn Dunel) ──────────────────────
+  airflow:
+    image: apache/airflow:2.8.0
+    container_name: smyp-airflow
+    ports:
+      - "8080:8080"
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=${AIRFLOW__CORE__EXECUTOR}
+      - AIRFLOW__CORE__LOAD_EXAMPLES=${AIRFLOW__CORE__LOAD_EXAMPLES}
+      - AIRFLOW__WEBSERVER__SECRET_KEY=${AIRFLOW__WEBSERVER__SECRET_KEY}
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=${AIRFLOW__DATABASE__SQL_ALCHEMY_CONN}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_BUCKET_RAW=${MINIO_BUCKET_RAW}
+      - MINIO_BUCKET_CLEAN=${MINIO_BUCKET_CLEAN}
+      - MINIO_BUCKET_CURATED=${MINIO_BUCKET_CURATED}
+      - MONGO_URI=${MONGO_URI}
+      - OCR_SERVICE_URL=${OCR_SERVICE_URL}
+      - ANOMALY_SERVICE_URL=${ANOMALY_SERVICE_URL}
+      - BACKEND_URL=${BACKEND_URL}
+      - _AIRFLOW_DB_MIGRATE=true
+      - _AIRFLOW_WWW_USER_CREATE=true
+      - _AIRFLOW_WWW_USER_USERNAME=${AIRFLOW_USERNAME}
+      - _AIRFLOW_WWW_USER_PASSWORD=${AIRFLOW_PASSWORD}
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/plugins:/opt/airflow/plugins
+      - airflow-logs:/opt/airflow/logs
+      - airflow-db:/opt/airflow
+    networks:
+      - smyp-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    restart: unless-stopped
+    command: standalone
+
+networks:
+  smyp-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+  airflow-logs:
+  airflow-db:

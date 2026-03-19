@@ -1,10 +1,12 @@
-# Stack Technique de l'étudiant 2
+# SMYP - ShareMeYourPaperasse
 
-## API
+## Stack Technique de l'étudiant 2 — API OCR
 
-Python - FastAPI
-OCR - EasyOCR
-NER - SpaCy
+- Python - FastAPI
+- OCR - EasyOCR
+- NER - SpaCy
+
+### Lancer l'API :
 
 ## Dépendances
 
@@ -18,13 +20,12 @@ cd ocr
 python -m uvicorn ap:app --reload
 ```
 
+## Stack Technique de l'étudiant 3
 
-# Stack Technique de l'étudiant 3
-
-## Frontend
+### Frontend
 
 ReactJS
 
-## Backend
+### Backend
 
 ExpressJS
