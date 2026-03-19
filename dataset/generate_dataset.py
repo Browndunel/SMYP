@@ -216,7 +216,7 @@ def _process_document(
         "anomalies": ground_truth["anomalies"],
         "expected_siret": ground_truth["fournisseur"]["siret"],
         "montant_ttc": ground_truth.get("montant_ttc", 0.0),
-        "tva_rate": ground_truth.get("tva_taux", 0),
+        "tva_rate": ground_truth.get("tva_rate", 0),
         "date_expiration": ground_truth.get("date_echeance", ""),
         "fichier_pdf": pdf_path.name,
         "fichier_gt": gt_path.name,

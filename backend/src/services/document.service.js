@@ -27,6 +27,27 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType, userId) => {
 
   const jsonRecu = response.data;
 
+  // Appel au service anomaly (non-bloquant)
+  let anomalyResult = { status: "OK", anomalies: [], anomaly_score: 0 };
+  try {
+    const anomalyPayload = {
+      file_id: jsonRecu.file_id || originalFileName,
+      file_name: originalFileName,
+      doc_type: jsonRecu.doc_type || "INCONNU",
+      ocr_confidence: jsonRecu.ocr_confidence || 0,
+      classification_confidence: jsonRecu.classification_confidence || 0,
+      fields: jsonRecu.fields || {},
+      related_docs: [],
+    };
+    const anomalyResp = await axios.post(
+      `${process.env.ANOMALY_API_URL}/validate`,
+      anomalyPayload,
+    );
+    anomalyResult = anomalyResp.data;
+  } catch (err) {
+    console.error("Anomaly service error:", err.message);
+  }
+
   let minioFileName = null;
 
   // Enregistre le document dans minIO
@@ -54,6 +75,9 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType, userId) => {
     userId: userId,
     minioPath: minioFileName,
     donneeExtraites: jsonRecu,
+    status: anomalyResult.status || "OK",
+    anomalies: (anomalyResult.anomalies || []).map((a) => a.description),
+    anomalyScore: anomalyResult.anomaly_score || 0,
   });
   await nouvelleEntree.save();
 
@@ -66,6 +90,9 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType, userId) => {
       userId: nouvelleEntree.userId,
       minioPth: nouvelleEntree.minioPath,
       donneeExtraites: nouvelleEntree.donneeExtraites,
+      status: nouvelleEntree.status,
+      anomalies: nouvelleEntree.anomalies,
+      anomalyScore: nouvelleEntree.anomalyScore,
     },
     statusCode: 201,
   };

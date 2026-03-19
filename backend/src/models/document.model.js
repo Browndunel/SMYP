@@ -6,6 +6,9 @@ const documentSchema = new mongoose.Schema({
   donneeExtraites: mongoose.Schema.Types.Mixed,
   userId: String,
   minioPath: String,
+  status: { type: String, enum: ["OK", "suspect", "frauduleux"], default: "OK" },
+  anomalies: [{ type: String }],
+  anomalyScore: { type: Number, default: 0 },
 });
 
 const Document = mongoose.model("Document", documentSchema);
