@@ -1,20 +1,25 @@
-import { ApiService } from './api'
+import { API_URL, ApiService } from './api'
 import { useAuthStore } from '../store/auth.store'
 import type { Document } from '../types'
 
-const API_URL = import.meta.env.VITE_API_URL
+function requireToken(): string {
+  const { token, logout } = useAuthStore.getState()
 
-function getToken(): string | null {
-  return useAuthStore.getState().token
+  if (!token) {
+    logout()
+    throw new Error('Session invalide, reconnectez-vous')
+  }
+
+  return token
 }
 
 export const documentsService = {
   async getDocuments(): Promise<Document[]> {
-    return ApiService.get<Document[]>('/api/documents', getToken())
+    return ApiService.get<Document[]>('/api/documents', requireToken())
   },
 
   async uploadDocuments(files: File[]): Promise<Document[]> {
-    const token = getToken()
+    const token = requireToken()
     const results: Document[] = []
     for (const file of files) {
       const formData = new FormData()
@@ -34,6 +39,6 @@ export const documentsService = {
   },
 
   async deleteDocument(id: string): Promise<void> {
-    return ApiService.delete<void>(`/api/documents/${id}`, getToken())
+    return ApiService.delete<void>(`/api/documents/${id}`, requireToken())
   },
 }

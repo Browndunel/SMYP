@@ -9,8 +9,16 @@ function extractMessage(err: unknown, fallback: string): string {
   return fallback
 }
 
+function assertToken(token: string | null | undefined): string {
+  if (!token) {
+    throw new Error('Token de connexion manquant')
+  }
+
+  return token
+}
+
 export function useAuth() {
-  const { token, isLoggedIn, login, logout } = useAuthStore()
+  const { token, login, logout } = useAuthStore()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -19,7 +27,7 @@ export function useAuth() {
     setError(null)
     try {
       const { token } = await authService.signIn(email, password)
-      login(token)
+      login(assertToken(token))
       return true
     } catch (err) {
       setError(extractMessage(err, 'Identifiants incorrects'))
@@ -34,7 +42,7 @@ export function useAuth() {
     setError(null)
     try {
       const { token } = await authService.signUp(email, password)
-      login(token)
+      login(assertToken(token))
       return true
     } catch (err) {
       setError(extractMessage(err, 'Erreur lors de la création du compte'))
@@ -44,5 +52,14 @@ export function useAuth() {
     }
   }
 
-  return { token, isLoggedIn, isLoading, error, signIn, signUp, logout, clearError: () => setError(null) }
+  return {
+    token,
+    isLoggedIn: Boolean(token),
+    isLoading,
+    error,
+    signIn,
+    signUp,
+    logout,
+    clearError: () => setError(null),
+  }
 }

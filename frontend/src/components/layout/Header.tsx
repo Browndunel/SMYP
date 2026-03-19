@@ -6,7 +6,7 @@ interface HeaderProps {
 }
 
 export function Header({ onLoginClick }: HeaderProps) {
-  const { isLoggedIn } = useAuthStore()
+  const { token } = useAuthStore()
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 h-14 flex items-center justify-between px-6 bg-background/80 backdrop-blur-sm border-b border-border">
@@ -15,7 +15,7 @@ export function Header({ onLoginClick }: HeaderProps) {
         <span className="font-medium tracking-[-0.02em] text-foreground text-sm">SMYP - ShareMeYourPaperasse</span>
       </a>
 
-      {!isLoggedIn && (
+      {!token && (
         <Button variant="secondary" size="sm" onClick={onLoginClick}>
           Se connecter
         </Button>

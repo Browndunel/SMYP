@@ -17,19 +17,19 @@ type Filter = 'all' | 'OK' | 'suspect' | 'frauduleux'
 
 export default function Conformite() {
   const navigate = useNavigate()
-  const { isLoggedIn } = useAuthStore()
+  const { token } = useAuthStore()
   const { documents, isLoading, fetchDocuments } = useDocuments()
   const { files, isUploading, error: uploadError, addFiles, removeFile, upload } = useUpload()
   const [filter, setFilter] = useState<Filter>('all')
   const [uploadModalOpen, setUploadModalOpen] = useState(false)
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!token) {
       navigate('/')
       return
     }
     fetchDocuments()
-  }, [isLoggedIn, navigate, fetchDocuments])
+  }, [token, navigate, fetchDocuments])
 
   const ok = documents.filter((d) => d.status === 'OK')
   const suspect = documents.filter((d) => d.status === 'suspect')
