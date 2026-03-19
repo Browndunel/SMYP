@@ -9,23 +9,23 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType) => {
   const form = new FormData();
   form.append("document", fileBuffer, originalFileName);
 
-  // const ocrApiUrl = process.env.OCR_API_URL;
+  const ocrApiUrl = process.env.OCR_API_URL + "/ocr";
 
-  // const response = await axios.post(ocrApiUrl, form, {
-  //   headers: {
-  //     ...form.getHeaders(),
-  //   },
-  // });
+  const response = await axios.post(ocrApiUrl, form, {
+    headers: {
+      ...form.getHeaders(),
+    },
+  });
 
-  // if (response.status != 200) {
-  //   return {
-  //     error: true,
-  //     data: response.data,
-  //     statusCode: 503,
-  //   };
-  // }
+  if (response.status != 200) {
+    return {
+      error: true,
+      data: response.data,
+      statusCode: 503,
+    };
+  }
 
-  // const jsonRecu = response.data;
+  const jsonRecu = response.data;
 
   // Enregistre le document dans minIO
   try {
@@ -46,11 +46,11 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType) => {
   }
 
   // Sauvegarde dans MongoDB
-  const jsonRecu = {
-    type: "Facture",
-    date: "12/12/23",
-    createur: "Jean Dupont",
-  };
+  // const jsonRecu = {
+  //   type: "Facture",
+  //   date: "12/12/23",
+  //   createur: "Jean Dupont",
+  // };
   const nouvelleEntree = new Document({
     nomFichierDOrigine: originalFileName,
     donneesExtraites: jsonRecu,

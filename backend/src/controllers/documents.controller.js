@@ -12,7 +12,7 @@ exports.Upload = async (req, res) => {
     );
     return res.status(resultat.statusCode).send(resultat.data);
   } catch (error) {
-    console.error("Erreur dans le contrôleur :", error.message);
+    console.error("Erreur dans upload document contrôleur :", error);
     res.status(500).send({
       error: "Une erreur est survenue lors du traitement du document.",
     });

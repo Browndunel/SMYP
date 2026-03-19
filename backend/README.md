@@ -6,11 +6,11 @@ Installer Docker
 
 ## Comment lancer l'api avec Docker
 
-`cd api`
+`cd backend`
 
 Copier le contenu _.env.exemple_ dans un nouveau fichier _.env.prod_
 
-Si besoin, remplacer le contenu des variables
+Remplacer ou ajouter le contenu des variables
 
 `npm run docker:up`
 
@@ -28,13 +28,13 @@ Installer MongoDB
 
 ## Comment lancer l'API avec node
 
-`cd api`
+`cd backend`
 
 `npm i`
 
 Copier le contenu _.env.exemple_ dans un nouveau fichier _.env.dev_
 
-Si besoin, remplacer le contenu des variables
+Remplacer ou ajouter le contenu des variables
 
 `npm run dev`
 
