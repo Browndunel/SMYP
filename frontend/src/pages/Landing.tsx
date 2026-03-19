@@ -9,7 +9,6 @@ import { Button } from '../components/ui/Button'
 import { useAuth } from '../hooks/useAuth'
 import { useUpload } from '../hooks/useUpload'
 
-type AuthStep = 'email' | 'password'
 type AuthMode = 'signin' | 'signup'
 
 export default function Landing() {
@@ -18,17 +17,13 @@ export default function Landing() {
   const { files, isUploading, error: uploadError, addFiles, removeFile, upload } = useUpload()
 
   const [modalOpen, setModalOpen] = useState(false)
-  const [step, setStep] = useState<AuthStep>('email')
   const [mode, setMode] = useState<AuthMode>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [emailError, setEmailError] = useState('')
 
   const openModal = () => {
-    setStep('email')
     setEmail('')
     setPassword('')
-    setEmailError('')
     clearError()
     setModalOpen(true)
   }
@@ -36,16 +31,6 @@ export default function Landing() {
   const closeModal = () => {
     setModalOpen(false)
     clearError()
-    setEmailError('')
-  }
-
-  const handleEmailNext = () => {
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setEmailError('Adresse email invalide')
-      return
-    }
-    setEmailError('')
-    setStep('password')
   }
 
   const handleAuth = async () => {
@@ -62,8 +47,6 @@ export default function Landing() {
     const ok = await upload()
     if (ok) navigate('/dashboard')
   }
-
-  const handleDropZoneClick = isLoggedIn ? undefined : openModal
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -94,25 +77,18 @@ export default function Landing() {
           {/* Drop zone */}
           <DropZone
             onFiles={addFiles}
-            onClick={handleDropZoneClick}
+            onClick={isLoggedIn ? undefined : openModal}
           />
 
           {/* File list */}
           <FileList files={files} onRemove={removeFile} />
 
-          {/* Upload error */}
           {uploadError && (
             <p className="mt-3 text-sm text-destructive text-center">{uploadError}</p>
           )}
 
-          {/* CTA */}
           {isLoggedIn && files.length > 0 && (
-            <Button
-              className="w-full mt-4"
-              size="lg"
-              onClick={handleUpload}
-              isLoading={isUploading}
-            >
+            <Button className="w-full mt-4" size="lg" onClick={handleUpload} isLoading={isUploading}>
               Envoyer {files.length} document{files.length > 1 ? 's' : ''}
             </Button>
           )}
@@ -131,73 +107,53 @@ export default function Landing() {
         onClose={closeModal}
         title={mode === 'signin' ? 'Se connecter' : 'Créer un compte'}
       >
-        {step === 'email' ? (
-          <div className="flex flex-col gap-4">
-            <Input
-              label="Adresse email"
-              id="email"
-              type="email"
-              placeholder="vous@exemple.fr"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              error={emailError}
-              onKeyDown={(e) => e.key === 'Enter' && handleEmailNext()}
-              autoFocus
-            />
-            <Button onClick={handleEmailNext} className="w-full">
-              Continuer
-            </Button>
-            <p className="text-xs text-center text-muted-foreground">
-              {mode === 'signin' ? (
-                <>
-                  Pas encore de compte ?{' '}
-                  <button
-                    className="text-primary hover:underline font-medium"
-                    onClick={() => setMode('signup')}
-                  >
-                    Créer un compte
-                  </button>
-                </>
-              ) : (
-                <>
-                  Déjà un compte ?{' '}
-                  <button
-                    className="text-primary hover:underline font-medium"
-                    onClick={() => setMode('signin')}
-                  >
-                    Se connecter
-                  </button>
-                </>
-              )}
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2">
-              <span className="text-sm text-foreground flex-1">{email}</span>
-              <button
-                className="text-xs text-primary hover:underline"
-                onClick={() => setStep('email')}
-              >
-                Modifier
-              </button>
-            </div>
-            <Input
-              label="Mot de passe"
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              error={authError ?? undefined}
-              onKeyDown={(e) => e.key === 'Enter' && handleAuth()}
-              autoFocus
-            />
-            <Button onClick={handleAuth} isLoading={authLoading} className="w-full">
-              {mode === 'signin' ? 'Se connecter' : 'Créer un compte'}
-            </Button>
-          </div>
-        )}
+        <div className="flex flex-col gap-4">
+          <Input
+            label="Adresse email"
+            id="email"
+            type="email"
+            placeholder="vous@exemple.fr"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoFocus
+          />
+          <Input
+            label="Mot de passe"
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            error={authError ?? undefined}
+            onKeyDown={(e) => e.key === 'Enter' && handleAuth()}
+          />
+          <Button onClick={handleAuth} isLoading={authLoading} className="w-full">
+            {mode === 'signin' ? 'Se connecter' : 'Créer un compte'}
+          </Button>
+          <p className="text-xs text-center text-muted-foreground">
+            {mode === 'signin' ? (
+              <>
+                Pas encore de compte ?{' '}
+                <button
+                  className="text-primary hover:underline font-medium"
+                  onClick={() => { setMode('signup'); clearError() }}
+                >
+                  Créer un compte
+                </button>
+              </>
+            ) : (
+              <>
+                Déjà un compte ?{' '}
+                <button
+                  className="text-primary hover:underline font-medium"
+                  onClick={() => { setMode('signin'); clearError() }}
+                >
+                  Se connecter
+                </button>
+              </>
+            )}
+          </p>
+        </div>
       </Modal>
     </div>
   )

@@ -1,14 +1,12 @@
-import { api } from './api'
+import { ApiService } from './api'
 import type { SignInResponse } from '../types'
 
 export const authService = {
   async signIn(email: string, password: string): Promise<SignInResponse> {
-    const { data } = await api.post<SignInResponse>('/api/sign-in', { email, password })
-    return data
+    return ApiService.post<SignInResponse>('/api/sign-in', { email, password })
   },
 
   async signUp(email: string, password: string): Promise<SignInResponse> {
-    const { data } = await api.post<SignInResponse>('/api/sign-up', { email, password })
-    return data
+    return ApiService.post<SignInResponse>('/api/sign-up', { email, password })
   },
 }
