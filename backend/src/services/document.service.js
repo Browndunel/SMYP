@@ -27,33 +27,33 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType, userId) => {
 
   const jsonRecu = response.data;
 
-  const minioFileName = null;
+  let minioFileName = null;
 
-  // // Enregistre le document dans minIO
-  // try {
-  //   const result = await minioService.uploadFile(
-  //     fileBuffer,
-  //     originalFileName,
-  //     mimeType,
-  //   );
-  //   if (result.error == true) {
-  //     return result;
-  //   }
-  //   minioFileName = result.data;
-  // } catch (error) {
-  //   return {
-  //     error: true,
-  //     data: error,
-  //     statusCode: 500,
-  //   };
-  // }
+  // Enregistre le document dans minIO
+  try {
+    const result = await minioService.uploadFile(
+      fileBuffer,
+      originalFileName,
+      mimeType,
+    );
+    if (result.error == true) {
+      return result;
+    }
+    minioFileName = result.data;
+  } catch (error) {
+    return {
+      error: true,
+      data: error,
+      statusCode: 500,
+    };
+  }
 
   // Sauvegarde dans MongoDB
   const nouvelleEntree = new Document({
     nomFichierDOrigine: originalFileName,
-    nomFichierMinIO: minioFileName,
-    donneesExtraites: jsonRecu,
     userId: userId,
+    minioPath: minioFileName,
+    donneeExtraites: jsonRecu,
   });
   await nouvelleEntree.save();
 
@@ -63,7 +63,9 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType, userId) => {
       id: nouvelleEntree._id,
       dateTraitement: nouvelleEntree.dateTraitement,
       nomFichierDOrigine: nouvelleEntree.nomFichierDOrigine,
-      donneesExtraites: nouvelleEntree.donneesExtraites,
+      userId: nouvelleEntree.userId,
+      minioPth: nouvelleEntree.minioPath,
+      donneeExtraites: nouvelleEntree.donneeExtraites,
     },
     statusCode: 201,
   };
@@ -96,4 +98,54 @@ exports.Delete = async (id) => {
     data: "Suppression effectuée",
     statusCode: 204,
   };
+};
+
+exports.Update = async (id, data) => {
+  try {
+    const {
+      nomFichierDOrigine,
+      dateTraitement,
+      donneeExtraites,
+      userId,
+      minioPath,
+    } = data;
+
+    const document = await Document.findById(id);
+
+    if (!document) {
+      return {
+        error: true,
+        data: "Le document est introuvable.",
+        statusCode: 404,
+      };
+    }
+
+    const updatedDocumentData = {
+      nomFichierDOrigine: nomFichierDOrigine ?? document.nomFichierDOrigine,
+      dateTraitement: dateTraitement ?? document.dateTraitement,
+      userId: userId ?? document.userId,
+      minioPath: minioPath ?? document.minioPath,
+      donneeExtraites: donneeExtraites ?? document.donneeExtraites,
+    };
+
+    const updatedDocument = await Document.findByIdAndUpdate(
+      id,
+      updatedDocumentData,
+      {
+        new: true,
+      },
+    );
+
+    return {
+      error: false,
+      data: updatedDocument,
+      statusCode: 200,
+    };
+  } catch (error) {
+    return {
+      error: true,
+      data: error,
+      statusCode: 500,
+    };
+  }
 };

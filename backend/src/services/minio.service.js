@@ -5,6 +5,7 @@ const minioClient = new Minio.Client({
   useSSL: process.env.MINIO_SECURE === "true",
   accessKey: process.env.MINIO_ACCESS_KEY,
   secretKey: process.env.MINIO_SECRET_KEY,
+  region: "eu-west-1",
 });
 
 const bucketName = process.env.MINIO_BUCKET_NAME;
