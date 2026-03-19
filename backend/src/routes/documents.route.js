@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const documentController = require("../controllers/documents.controller");
+const pipelineController = require("../controllers/pipeline.controller");
 const authenticate = require("../middlewares/authenticate.middlware");
 const { documentSchema } = require("../dtos/document.dtos");
 const validateWithJoi = require("../middlewares/validation.middleware");
@@ -148,5 +149,10 @@ router.put(
   validateWithJoi(documentSchema),
   documentController.Update,
 );
+
+// ── Routes internes appelées par Airflow ─────────────────────
+router.post("/pipeline/status",       pipelineController.UpdateStatus);
+router.get("/pipeline/status/:file_id", authenticate, pipelineController.GetStatus);
+router.post("/internal/store",        pipelineController.StoreDocument);
 
 module.exports = router;

@@ -2,6 +2,7 @@ const axios = require("axios");
 const FormData = require("form-data");
 const Document = require("../models/document.model");
 const minioService = require("../services/minio.service");
+const airflowService = require("../services/airflow.service");
 
 exports.Upload = async (fileBuffer, originalFileName, mimeType, userId) => {
   // Renvoi les document à l'OCR et attend la réponse
@@ -77,6 +78,23 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType, userId) => {
     anomalyScore: anomalyResult.anomaly_score || 0,
   });
   await nouvelleEntree.save();
+
+  // Déclenche le pipeline Airflow (non-bloquant) avec les données déjà traitées
+  airflowService.triggerPipeline({
+    file_id:       String(nouvelleEntree._id),
+    file_name:     originalFileName,
+    doc_type:      jsonRecu.doc_type || "INCONNU",
+    status:        nouvelleEntree.status,
+    anomaly_score: nouvelleEntree.anomalyScore,
+    anomalies:     nouvelleEntree.anomalies,
+    fields:        jsonRecu.fields || {},
+    ocr_confidence: jsonRecu.ocr_confidence || 0,
+    user_id:       String(userId),
+  }).then(() => {
+    console.log(`[Airflow] Pipeline déclenché pour ${nouvelleEntree._id}`);
+  }).catch((err) => {
+    console.warn(`[Airflow] Trigger échoué (non-bloquant) : ${err.message}`);
+  });
 
   return {
     error: false,
