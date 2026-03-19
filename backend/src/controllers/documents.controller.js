@@ -9,6 +9,7 @@ exports.Upload = async (req, res) => {
       req.file.buffer,
       req.file.originalname,
       req.file.mimetype,
+      req.user.userId,
     );
     return res.status(resultat.statusCode).send(resultat.data);
   } catch (error) {
@@ -21,7 +22,7 @@ exports.Upload = async (req, res) => {
 
 exports.GetAll = async (req, res) => {
   try {
-    const resultat = await documentService.GetAll();
+    const resultat = await documentService.GetAll(req.user.userId);
     return res.status(resultat.statusCode).send(resultat.data);
   } catch (error) {
     console.error("Erreur dans le contrôleur :", error.message);

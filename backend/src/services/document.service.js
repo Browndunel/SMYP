@@ -3,11 +3,11 @@ const FormData = require("form-data");
 const Document = require("../models/document.model");
 const minioService = require("../services/minio.service");
 
-exports.Upload = async (fileBuffer, originalFileName, mimeType) => {
+exports.Upload = async (fileBuffer, originalFileName, mimeType, userId) => {
   // Renvoi les document à l'OCR et attend la réponse
 
   const form = new FormData();
-  form.append("document", fileBuffer, originalFileName);
+  form.append("file", fileBuffer, originalFileName);
 
   const ocrApiUrl = process.env.OCR_API_URL + "/ocr";
 
@@ -27,33 +27,33 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType) => {
 
   const jsonRecu = response.data;
 
-  // Enregistre le document dans minIO
-  try {
-    const result = await minioService.uploadFile(
-      fileBuffer,
-      originalFileName,
-      mimeType,
-    );
-    if (result.error == true) {
-      return result;
-    }
-  } catch (error) {
-    return {
-      error: true,
-      data: error,
-      statusCode: 500,
-    };
-  }
+  const minioFileName = null;
+
+  // // Enregistre le document dans minIO
+  // try {
+  //   const result = await minioService.uploadFile(
+  //     fileBuffer,
+  //     originalFileName,
+  //     mimeType,
+  //   );
+  //   if (result.error == true) {
+  //     return result;
+  //   }
+  //   minioFileName = result.data;
+  // } catch (error) {
+  //   return {
+  //     error: true,
+  //     data: error,
+  //     statusCode: 500,
+  //   };
+  // }
 
   // Sauvegarde dans MongoDB
-  // const jsonRecu = {
-  //   type: "Facture",
-  //   date: "12/12/23",
-  //   createur: "Jean Dupont",
-  // };
   const nouvelleEntree = new Document({
     nomFichierDOrigine: originalFileName,
+    nomFichierMinIO: minioFileName,
     donneesExtraites: jsonRecu,
+    userId: userId,
   });
   await nouvelleEntree.save();
 
@@ -69,8 +69,8 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType) => {
   };
 };
 
-exports.GetAll = async () => {
-  const document = await Document.find();
+exports.GetAll = async (userId) => {
+  const document = await Document.find({ userId });
   return {
     error: false,
     data: document,
