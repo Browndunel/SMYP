@@ -1,0 +1,28 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch index.js",
+    "docker:up": "docker compose --env-file .env.prod up -d --build",
+    "docker:down": "docker compose --env-file .env.prod down"
+  },
+  "author": "Eloïc Lesellier",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.13.6",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-validator": "^7.3.1",
+    "form-data": "^4.0.5",
+    "joi": "^18.0.2",
+    "jsonwebtoken": "^9.0.3",
+    "minio": "^8.0.7",
+    "mongoose": "^9.3.0",
+    "multer": "^2.1.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  }
+}
