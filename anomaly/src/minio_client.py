@@ -1,4 +1,7 @@
-"""Client MinIO configuré depuis le .env"""
+"""
+Connexion au MinIO partagé (hébergé par Louise).
+Les credentials sont dans le .env à la racine du projet.
+"""
 
 import os
 from pathlib import Path

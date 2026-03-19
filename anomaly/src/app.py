@@ -1,31 +1,34 @@
 """
-Webservice FastAPI pour la détection de fraude documentaire.
-POST /validate -> analyse et retourne les anomalies.
-GET /health -> healthcheck
-GET /docs -> documentation Swagger auto-générée par FastAPI
+API REST du service de détection d'anomalies.
+Expose un endpoint POST /validate qui prend les données OCR d'un document,
+lance l'analyse (règles métier + ML) et renvoie le verdict.
+Le résultat est aussi poussé sur MinIO dans le dossier curated/.
 """
 
-import sys
+import sys, io, json
 from pathlib import Path
+
+# pour que les imports marchent même si on lance le fichier directement
 sys.path.insert(0, str(Path(__file__).parent))
 
-import io
-import json
-
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
 from fraud_detector import detect
 from minio_client import client, BUCKET
 
+
 app = FastAPI(
     title="Anomaly Service",
-    description="Détection de fraude documentaire - Règles R1-R7 + ML",
+    description="Détection de fraude documentaire — règles R1-R7 + IsolationForest",
     version="1.0.0",
 )
 
 
+# --- Modèles Pydantic (validation auto des entrées/sorties) ---
+
 class DocumentFields(BaseModel):
-    """Champs extraits par l'OCR/NER, tous optionnels car ça dépend du type de doc."""
+    """Champs qu'on peut recevoir de l'OCR. Tous optionnels vu que
+    ça dépend du type de doc (une facture a un IBAN, pas un Kbis)."""
     siret: str | None = None
     siren: str | None = None
     fournisseur: str | None = None
@@ -39,19 +42,16 @@ class DocumentFields(BaseModel):
     tva_rate: float | None = None
     date_emission: str | None = None
     date_expiration: str | None = None
-
-    model_config = {"extra": "allow"}
+    model_config = {"extra": "allow"}  # accepte les champs imprévus
 
 
 class RelatedDocument(BaseModel):
-    """Un document lié au document principal (ex: attestation URSSAF liée à une facture)."""
     file_id: str | None = None
     doc_type: str
     fields: DocumentFields
 
 
 class ValidateRequest(BaseModel):
-    """Payload d'entrée pour POST /validate."""
     file_id: str
     file_name: str | None = None
     doc_type: str
@@ -68,36 +68,37 @@ class AnomalyItem(BaseModel):
 
 
 class ValidateResponse(BaseModel):
-    """Format de sortie, compatible avec ce qu'attend Airflow pour écrire en MongoDB."""
     file_id: str
-    status: str
-    anomaly_score: float
+    status: str          # OK / suspect / frauduleux
+    anomaly_score: float  # 0 à 1
     confidence_score: float
     anomalies: list[AnomalyItem]
     processing_time_ms: int
 
 
+# --- Endpoints ---
+
 @app.post("/validate", response_model=ValidateResponse)
 async def validate(req: ValidateRequest):
-    payload = req.model_dump()
-    result = detect(payload)
+    """Analyse un document, renvoie les anomalies et push sur MinIO."""
+    result = detect(req.model_dump())
 
-    # Push le résultat dans smyp-curated
-    data = json.dumps(result, ensure_ascii=False).encode("utf-8")
-    object_name = f"curated/{result['file_id']}.json"
-    client.put_object(BUCKET, object_name, io.BytesIO(data), len(data), content_type="application/json")
+    # on stocke le résultat dans le bucket MinIO (dossier curated/)
+    payload = json.dumps(result, ensure_ascii=False).encode("utf-8")
+    key = f"curated/{result['file_id']}.json"
+    client.put_object(BUCKET, key, io.BytesIO(payload), len(payload),
+                      content_type="application/json")
 
     return result
 
 
 @app.get("/health")
 async def health():
-    """Healthcheck pour vérifier que le service tourne."""
     return {"status": "ok"}
 
 
 if __name__ == "__main__":
     import uvicorn
-    print("Anomaly service running on http://localhost:8002")
-    print("Swagger UI: http://localhost:8002/docs")
+    print("Anomaly service → http://localhost:8002")
+    print("Swagger         → http://localhost:8002/docs")
     uvicorn.run(app, host="0.0.0.0", port=8002)
