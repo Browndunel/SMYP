@@ -11,25 +11,33 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType, userId) => {
 
   const ocrApiUrl = process.env.OCR_API_URL + "/ocr";
 
-  const response = await axios.post(ocrApiUrl, form, {
+  const ocrResponse = await axios.post(ocrApiUrl, form, {
     headers: {
       ...form.getHeaders(),
     },
   });
 
-  if (response.status != 200) {
+  if (ocrResponse.status != 200) {
     return {
       error: true,
-      data: response.data,
+      data: ocrResponse.data,
       statusCode: 503,
     };
   }
 
-  const jsonRecu = response.data;
+  const jsonRecu = ocrResponse.data;
+  console.log(jsonRecu);
 
-  let minioFileName = null;
+  // Envoi des réponses à l'anomaly service
+
+  const anomalyApiUrl = process.env.ANOMALY_API_URL + "/validate";
+
+  const anomalyResponse = await axios.post(ocrApiUrl, ocrResponse.data);
+
+  console.log(anomalyResponse);
 
   // Enregistre le document dans minIO
+  let minioFileName = null;
   try {
     const result = await minioService.uploadFile(
       fileBuffer,
