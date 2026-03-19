@@ -6,6 +6,8 @@ Installer Docker
 
 ## Comment lancer l'api avec Docker
 
+Démarrer votre Docker
+
 `cd backend`
 
 Copier le contenu _.env.exemple_ dans un nouveau fichier _.env.prod_
