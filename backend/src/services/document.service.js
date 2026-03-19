@@ -3,11 +3,11 @@ const FormData = require("form-data");
 const Document = require("../models/document.model");
 const minioService = require("../services/minio.service");
 
-exports.Upload = async (fileBuffer, originalFileName, mimeType) => {
+exports.Upload = async (fileBuffer, originalFileName, mimeType, userId) => {
   // Renvoi les document à l'OCR et attend la réponse
 
   const form = new FormData();
-  form.append("document", fileBuffer, originalFileName);
+  form.append("file", fileBuffer, originalFileName);
 
   const ocrApiUrl = process.env.OCR_API_URL + "/ocr";
 
@@ -27,6 +27,8 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType) => {
 
   const jsonRecu = response.data;
 
+  let minioFileName = null;
+
   // Enregistre le document dans minIO
   try {
     const result = await minioService.uploadFile(
@@ -37,6 +39,7 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType) => {
     if (result.error == true) {
       return result;
     }
+    minioFileName = result.data;
   } catch (error) {
     return {
       error: true,
@@ -46,14 +49,11 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType) => {
   }
 
   // Sauvegarde dans MongoDB
-  // const jsonRecu = {
-  //   type: "Facture",
-  //   date: "12/12/23",
-  //   createur: "Jean Dupont",
-  // };
   const nouvelleEntree = new Document({
     nomFichierDOrigine: originalFileName,
-    donneesExtraites: jsonRecu,
+    userId: userId,
+    minioPath: minioFileName,
+    donneeExtraites: jsonRecu,
   });
   await nouvelleEntree.save();
 
@@ -63,14 +63,16 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType) => {
       id: nouvelleEntree._id,
       dateTraitement: nouvelleEntree.dateTraitement,
       nomFichierDOrigine: nouvelleEntree.nomFichierDOrigine,
-      donneesExtraites: nouvelleEntree.donneesExtraites,
+      userId: nouvelleEntree.userId,
+      minioPth: nouvelleEntree.minioPath,
+      donneeExtraites: nouvelleEntree.donneeExtraites,
     },
     statusCode: 201,
   };
 };
 
-exports.GetAll = async () => {
-  const document = await Document.find();
+exports.GetAll = async (userId) => {
+  const document = await Document.find({ userId });
   return {
     error: false,
     data: document,
@@ -96,4 +98,54 @@ exports.Delete = async (id) => {
     data: "Suppression effectuée",
     statusCode: 204,
   };
+};
+
+exports.Update = async (id, data) => {
+  try {
+    const {
+      nomFichierDOrigine,
+      dateTraitement,
+      donneeExtraites,
+      userId,
+      minioPath,
+    } = data;
+
+    const document = await Document.findById(id);
+
+    if (!document) {
+      return {
+        error: true,
+        data: "Le document est introuvable.",
+        statusCode: 404,
+      };
+    }
+
+    const updatedDocumentData = {
+      nomFichierDOrigine: nomFichierDOrigine ?? document.nomFichierDOrigine,
+      dateTraitement: dateTraitement ?? document.dateTraitement,
+      userId: userId ?? document.userId,
+      minioPath: minioPath ?? document.minioPath,
+      donneeExtraites: donneeExtraites ?? document.donneeExtraites,
+    };
+
+    const updatedDocument = await Document.findByIdAndUpdate(
+      id,
+      updatedDocumentData,
+      {
+        new: true,
+      },
+    );
+
+    return {
+      error: false,
+      data: updatedDocument,
+      statusCode: 200,
+    };
+  } catch (error) {
+    return {
+      error: true,
+      data: error,
+      statusCode: 500,
+    };
+  }
 };

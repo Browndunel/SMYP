@@ -5,6 +5,7 @@ const minioClient = new Minio.Client({
   useSSL: process.env.MINIO_SECURE === "true",
   accessKey: process.env.MINIO_ACCESS_KEY,
   secretKey: process.env.MINIO_SECRET_KEY,
+  region: "eu-west-1",
 });
 
 const bucketName = process.env.MINIO_BUCKET_NAME;
@@ -14,6 +15,7 @@ const uploadFile = async (fileBuffer, originalName, mimetype) => {
   try {
     const exists = await minioClient.bucketExists(bucketName);
     if (!exists) {
+      console.error("Le bucket minio n'existe pas");
       return {
         error: true,
         data: "Le bucket minio n'existe pas",
@@ -21,7 +23,7 @@ const uploadFile = async (fileBuffer, originalName, mimetype) => {
       };
     }
 
-    const uniqueFileName = `${Date.now()}-${originalName.replace(/\s+/g, "_")}`;
+    const uniqueFileName = `raw/${Date.now()}-${originalName.replace(/\s+/g, "_")}`;
 
     const metaData = {
       "Content-Type": mimetype,

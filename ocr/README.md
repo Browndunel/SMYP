@@ -8,8 +8,16 @@
 
 ### Lancer l'API :
 
+## Dépendances
+
 ```bash
-python -m uvicorn main:app --reload
+pip install --user fastapi uvicorn easyocr spacy python-multipart pillow pdf2image
+```
+
+## Lancer l'API :
+```bash
+cd ocr
+python -m uvicorn ap:app --reload
 ```
 
 ## Stack Technique de l'étudiant 3

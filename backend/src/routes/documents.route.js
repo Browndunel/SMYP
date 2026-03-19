@@ -3,6 +3,8 @@ const router = express.Router();
 const multer = require("multer");
 const documentController = require("../controllers/documents.controller");
 const authenticate = require("../middlewares/authenticate.middlware");
+const { documentSchema } = require("../dtos/document.dtos");
+const validateWithJoi = require("../middlewares/validation.middleware");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -95,5 +97,56 @@ router.get("/documents", authenticate, documentController.GetAll);
  *         description: Erreur serveur
  */
 router.delete("/documents/:id", authenticate, documentController.Delete);
+
+/**
+ * @openapi
+ * /api/documents/{id}:
+ *   put:
+ *     description: Modifie les informations d'un document existant
+ *     tags:
+ *       - Documents
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: L'ID MongoDB du document à modifier
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nomFichierDOrigine:
+ *                 type: string
+ *               dateTraitement:
+ *                 type: string
+ *                 format: date-time
+ *               donneeExtraites:
+ *                 type: object
+ *               userId:
+ *                 type: string
+ *               minioPath:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Document mis à jour avec succès
+ *       '400':
+ *         description: Données invalides envoyées
+ *       '404':
+ *         description: Document introuvable
+ *       '500':
+ *         description: Erreur serveur
+ */
+router.put(
+  "/documents/:id",
+  authenticate,
+  validateWithJoi(documentSchema),
+  documentController.Update,
+);
 
 module.exports = router;
