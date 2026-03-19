@@ -3,6 +3,8 @@ const router = express.Router();
 const multer = require("multer");
 const documentController = require("../controllers/documents.controller");
 const authenticate = require("../middlewares/authenticate.middlware");
+const { documentSchema } = require("../dtos/document.dtos");
+const validateWithJoi = require("../middlewares/validation.middleware");
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -98,7 +100,7 @@ router.delete("/documents/:id", authenticate, documentController.Delete);
 
 /**
  * @openapi
- * /documents/{id}:
+ * /api/documents/{id}:
  *   put:
  *     description: Modifie les informations d'un document existant
  *     tags:
@@ -121,6 +123,15 @@ router.delete("/documents/:id", authenticate, documentController.Delete);
  *             properties:
  *               nomFichierDOrigine:
  *                 type: string
+ *               dateTraitement:
+ *                 type: string
+ *                 format: date-time
+ *               donneeExtraites:
+ *                 type: object
+ *               userId:
+ *                 type: string
+ *               minioPath:
+ *                 type: string
  *     responses:
  *       '200':
  *         description: Document mis à jour avec succès
@@ -131,6 +142,11 @@ router.delete("/documents/:id", authenticate, documentController.Delete);
  *       '500':
  *         description: Erreur serveur
  */
-router.put("/documents/:id", authenticate, documentController.Update);
+router.put(
+  "/documents/:id",
+  authenticate,
+  validateWithJoi(documentSchema),
+  documentController.Update,
+);
 
 module.exports = router;

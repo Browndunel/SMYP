@@ -1,8 +1,11 @@
 const Joi = require("joi");
 
 const documentSchema = Joi.object({
-  email: Joi.string().email().required(),
-  password: Joi.string().min(6).required(),
+  nomFichierDOrigine: Joi.string().required(),
+  dateTraitement: Joi.date().required(),
+  userId: Joi.string().required(),
+  minioPath: Joi.string(),
+  donneeExtraites: Joi.object().unknown(true),
 });
 
 module.exports = { documentSchema };

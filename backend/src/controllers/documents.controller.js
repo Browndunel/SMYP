@@ -62,7 +62,23 @@ exports.Update = async (req, res) => {
         statusCode: 404,
       });
     }
-    const result = await documentService.Update(id);
+    const {
+      nomFichierDOrigine,
+      dateTraitement,
+      donneeExtraites,
+      userId,
+      minioPath,
+    } = req.body;
+    const result = await documentService.Update(id, {
+      nomFichierDOrigine,
+      dateTraitement,
+      donneeExtraites,
+      userId,
+      minioPath,
+    });
+    if (result.error == true) {
+      console.error(result);
+    }
     return res.status(result.statusCode).send(result.data);
   } catch (error) {
     console.error("Erreur dans le contrôleur :", error.message);
