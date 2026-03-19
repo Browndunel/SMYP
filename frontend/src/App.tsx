@@ -5,14 +5,14 @@ import Conformite from './pages/Conformite'
 import { useAuthStore } from './store/auth.store'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isLoggedIn } = useAuthStore()
-  if (!isLoggedIn) return <Navigate to="/" replace />
+  const { token } = useAuthStore()
+  if (!token) return <Navigate to="/" replace />
   return <>{children}</>
 }
 
 function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { isLoggedIn } = useAuthStore()
-  if (isLoggedIn) return <Navigate to="/dashboard" replace />
+  const { token } = useAuthStore()
+  if (token) return <Navigate to="/dashboard" replace />
   return <>{children}</>
 }
 

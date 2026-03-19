@@ -15,7 +15,7 @@ import type { Document } from '../types'
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const { isLoggedIn } = useAuthStore()
+  const { token } = useAuthStore()
   const { documents, isLoading, fetchDocuments, deleteDocument } = useDocuments()
   const { files, isUploading, error: uploadError, addFiles, removeFile, upload } = useUpload()
 
@@ -24,12 +24,12 @@ export default function Dashboard() {
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!token) {
       navigate('/')
       return
     }
     fetchDocuments()
-  }, [isLoggedIn, navigate, fetchDocuments])
+  }, [token, navigate, fetchDocuments])
 
   // Auto-select first document
   useEffect(() => {

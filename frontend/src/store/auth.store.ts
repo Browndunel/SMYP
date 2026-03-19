@@ -12,7 +12,17 @@ export const useAuthStore = create<AuthStore>()(
     }),
     {
       name: 'smyp-auth',
-      partialize: (state) => ({ token: state.token, isLoggedIn: state.isLoggedIn }),
+      partialize: (state) => ({ token: state.token }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return
+
+        if (state.token) {
+          state.login(state.token)
+          return
+        }
+
+        state.logout()
+      },
     }
   )
 )
