@@ -11,10 +11,10 @@ Combine des **règles métier déterministes** (R1-R7) et un **modèle ML** (Iso
 │   ├── fraud_detector.py # Moteur de règles R1-R7 + appel ML
 │   ├── ml_detector.py    # Charge model.pkl et fait l'inférence IsolationForest
 │   ├── train.py          # Entraîne le modèle et génère model.pkl
-│   └── generate_data.py  # Génère des données d'entraînement fictives (dev)
 ├── tests/                # Tests
 │   └── test_real.py      # Tests standalone sans serveur (dev)
 ├── data/                 # Données
+│   ├── generate_data.py  # Génère des données d'entraînement fictives (dev)
 │   └── mes_factures.csv  # Données d'entraînement (dev)
 ├── models/               # Modèles ML
 │   └── model.pkl         # Modèle sérialisé (généré par train.py)
