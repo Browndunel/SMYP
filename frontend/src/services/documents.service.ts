@@ -2,6 +2,17 @@ import { API_URL, ApiService } from './api'
 import { useAuthStore } from '../store/auth.store'
 import type { Document } from '../types'
 
+type RawDocument = Omit<Document, 'id'> & { id?: string; _id?: string }
+
+function normalize(raw: RawDocument): Document {
+  return {
+    ...raw,
+    id: raw.id ?? raw._id ?? '',
+    fields: raw.fields ?? {},
+    anomalies: raw.anomalies ?? [],
+  }
+}
+
 function requireToken(): string {
   const { token, logout } = useAuthStore.getState()
 
@@ -15,7 +26,8 @@ function requireToken(): string {
 
 export const documentsService = {
   async getDocuments(): Promise<Document[]> {
-    return ApiService.get<Document[]>('/api/documents', requireToken())
+    const raw = await ApiService.get<RawDocument[]>('/api/documents', requireToken())
+    return raw.map(normalize)
   },
 
   async uploadDocuments(files: File[]): Promise<Document[]> {
@@ -33,7 +45,7 @@ export const documentsService = {
       })
       const data = await res.json()
       if (!res.ok) throw data
-      results.push(data as Document)
+      results.push(normalize(data as RawDocument))
     }
     return results
   },

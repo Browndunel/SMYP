@@ -41,7 +41,8 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
     ? 'suspect'
     : 'frauduleux'
 
-  const fields = Object.entries(document.fields).filter(([, v]) => v !== undefined && v !== null)
+  const fields = Object.entries(document.fields ?? {}).filter(([, v]) => v !== undefined && v !== null)
+  const anomalies: string[] = document.anomalies ?? []
 
   return (
     <div className="flex flex-col gap-5">
@@ -57,7 +58,7 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
       </div>
 
       {/* Anomalies */}
-      {document.anomalies.length > 0 && (
+      {anomalies.length > 0 && (
         <div className={[
           'rounded-lg border p-4',
           document.status === 'frauduleux'
@@ -74,11 +75,11 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
               'text-[11px] font-medium uppercase tracking-[0.08em]',
               document.status === 'frauduleux' ? 'text-red-700' : 'text-amber-700',
             ].join(' ')}>
-              {document.anomalies.length} anomalie{document.anomalies.length > 1 ? 's' : ''} détectée{document.anomalies.length > 1 ? 's' : ''}
+              {anomalies.length} anomalie{anomalies.length > 1 ? 's' : ''} détectée{anomalies.length > 1 ? 's' : ''}
             </p>
           </div>
           <ul className="space-y-1">
-            {document.anomalies.map((anomaly, i) => (
+            {anomalies.map((anomaly: string, i: number) => (
               <li
                 key={i}
                 className={[
@@ -114,7 +115,7 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
         </div>
       )}
 
-      {fields.length === 0 && document.anomalies.length === 0 && (
+      {fields.length === 0 && anomalies.length === 0 && (
         <p className="text-sm text-muted-foreground">Aucune donnée extraite.</p>
       )}
     </div>
