@@ -27,26 +27,26 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType, userId) => {
 
   const jsonRecu = response.data;
 
-  const minioFileName = null;
+  let minioFileName = null;
 
-  // // Enregistre le document dans minIO
-  // try {
-  //   const result = await minioService.uploadFile(
-  //     fileBuffer,
-  //     originalFileName,
-  //     mimeType,
-  //   );
-  //   if (result.error == true) {
-  //     return result;
-  //   }
-  //   minioFileName = result.data;
-  // } catch (error) {
-  //   return {
-  //     error: true,
-  //     data: error,
-  //     statusCode: 500,
-  //   };
-  // }
+  // Enregistre le document dans minIO
+  try {
+    const result = await minioService.uploadFile(
+      fileBuffer,
+      originalFileName,
+      mimeType,
+    );
+    if (result.error == true) {
+      return result;
+    }
+    minioFileName = result.data;
+  } catch (error) {
+    return {
+      error: true,
+      data: error,
+      statusCode: 500,
+    };
+  }
 
   // Sauvegarde dans MongoDB
   const nouvelleEntree = new Document({

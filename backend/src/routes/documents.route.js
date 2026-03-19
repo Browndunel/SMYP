@@ -96,4 +96,41 @@ router.get("/documents", authenticate, documentController.GetAll);
  */
 router.delete("/documents/:id", authenticate, documentController.Delete);
 
+/**
+ * @openapi
+ * /documents/{id}:
+ *   put:
+ *     description: Modifie les informations d'un document existant
+ *     tags:
+ *       - Documents
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: L'ID MongoDB du document à modifier
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nomFichierDOrigine:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Document mis à jour avec succès
+ *       '400':
+ *         description: Données invalides envoyées
+ *       '404':
+ *         description: Document introuvable
+ *       '500':
+ *         description: Erreur serveur
+ */
+router.put("/documents/:id", authenticate, documentController.Update);
+
 module.exports = router;
