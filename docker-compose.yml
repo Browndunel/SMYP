@@ -1,20 +1,11 @@
-
 # ============================================================
 # SMYP – docker-compose.yml
 # Brawn Dunel — Lance tout avec : docker-compose up --build -d
 # ============================================================
 
-networks:
-  smyp-network:
-    driver: bridge
-
-volumes:
-  mongo-data:
-  airflow-logs:
-  airflow-db:
-
 services:
-  # ── 2. MongoDB (Louise) ──────────────────────────────────
+
+  # ── 1. MongoDB (Louise) ──────────────────────────────────
   mongodb:
     image: mongo:7
     container_name: smyp-mongodb
@@ -31,7 +22,7 @@ services:
       retries: 5
       start_period: 15s
 
-  # ── 3. OCR Service (Ludo) ────────────────────────────────
+  # ── 2. OCR Service (Ludo) ────────────────────────────────
   ocr-service:
     build:
       context: ./ocr
@@ -49,9 +40,6 @@ services:
       - ./ocr:/app
     networks:
       - smyp-network
-    depends_on:
-      minio:
-        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
@@ -60,7 +48,7 @@ services:
       retries: 5
       start_period: 30s
 
-  # ── 4. Anomaly Service (Loan) ────────────────────────────
+  # ── 3. Anomaly Service (Loan) ────────────────────────────
   anomaly-service:
     build:
       context: ./anomaly
@@ -82,7 +70,7 @@ services:
       retries: 5
       start_period: 20s
 
-  # ── 5. Backend Node/Express (Eloic) ──────────────────────
+  # ── 4. Backend Node/Express (Eloic) ──────────────────────
   backend:
     build:
       context: ./backend
@@ -122,7 +110,7 @@ services:
       retries: 5
       start_period: 20s
 
-  # ── 6. Frontend React (Eloic) ────────────────────────────
+  # ── 5. Frontend React (Eloic) ────────────────────────────
   frontend:
     build:
       context: ./frontend
@@ -141,11 +129,9 @@ services:
       - backend
     restart: unless-stopped
 
-  # ── 7. Airflow (Brawn Dunel) ─────────────────────────────
+ # ── 6. Apache Airflow (Brawn Dunel) ──────────────────────
   airflow:
-    build:
-      context: ./airflow
-      dockerfile: Dockerfile
+    image: apache/airflow:2.8.0
     container_name: smyp-airflow
     ports:
       - "8080:8080"
@@ -164,8 +150,10 @@ services:
       - OCR_SERVICE_URL=${OCR_SERVICE_URL}
       - ANOMALY_SERVICE_URL=${ANOMALY_SERVICE_URL}
       - BACKEND_URL=${BACKEND_URL}
-      - AIRFLOW_USERNAME=${AIRFLOW_USERNAME}
-      - AIRFLOW_PASSWORD=${AIRFLOW_PASSWORD}
+      - _AIRFLOW_DB_MIGRATE=true
+      - _AIRFLOW_WWW_USER_CREATE=true
+      - _AIRFLOW_WWW_USER_USERNAME=${AIRFLOW_USERNAME}
+      - _AIRFLOW_WWW_USER_PASSWORD=${AIRFLOW_PASSWORD}
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/plugins:/opt/airflow/plugins
@@ -177,9 +165,13 @@ services:
       mongodb:
         condition: service_healthy
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 60s
+    command: standalone
+
+networks:
+  smyp-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+  airflow-logs:
+  airflow-db:
