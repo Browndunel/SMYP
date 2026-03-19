@@ -17,7 +17,7 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const { token } = useAuthStore()
   const { documents, isLoading, fetchDocuments, deleteDocument } = useDocuments()
-  const { files, isUploading, error: uploadError, addFiles, removeFile, upload } = useUpload()
+  const { files, isUploading, uploadProgress, error: uploadError, addFiles, removeFile, upload } = useUpload()
 
   const [selectedDoc, setSelectedDoc] = useState<Document | null>(null)
   const [uploadModalOpen, setUploadModalOpen] = useState(false)
@@ -133,6 +133,20 @@ export default function Dashboard() {
         <div className="flex flex-col gap-4">
           <DropZone onFiles={addFiles} compact />
           <FileList files={files} onRemove={removeFile} />
+          {isUploading && (
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Envoi en cours…</span>
+                <span>{uploadProgress}%</span>
+              </div>
+              <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-300"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
           {uploadError && (
             <p className="text-sm text-destructive">{uploadError}</p>
           )}
