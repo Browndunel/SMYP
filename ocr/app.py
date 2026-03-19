@@ -18,6 +18,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 def extract_fields(text):
     data = {}
+    score = 0
 
     clean_text = text.replace("\n", " ")
 
@@ -25,38 +26,49 @@ def extract_fields(text):
     siret = re.search(r"(?:\d[\s]*){14}", clean_text)
     if siret:
         data["siret"] = re.sub(r"\s", "", siret.group())
+        score += 0.2
 
     # IBAN
     iban = re.search(r"FR\d{2}(?:\s?\d{4}){5}", clean_text)
     if iban:
         data["iban"] = iban.group().replace(" ", "")
+        score += 0.2
 
     # Dates
     date = re.search(r"\d{4}-\d{2}-\d{2}", clean_text)
     if date:
         data["date_emission"] = date.group()
+        score += 0.1
+
     else:
         date = re.search(r"\d{2}/\d{2}/\d{4}", clean_text)
         if date:
             data["date_emission"] = date.group()
+            score += 0.1
+
 
     # Montants
     amounts = re.findall(r"\d+[.,]\d{2}", clean_text)
     if amounts:
         data["montant_ttc"] = float(amounts[-1].replace(",", "."))
         data["montant_ht"] = float(amounts[0].replace(",", "."))
+        score += 0.2
 
     # TVA
     tva = re.search(r"(20|10|5\.5|2\.1)\s?%", clean_text)
     if tva:
         data["tva_rate"] = float(tva.group().replace("%", ""))
+        score += 0.1
 
     # Fournisseur
     doc = nlp(clean_text)
     for ent in doc.ents:
         if ent.label_ == "ORG":
             data["fournisseur"] = ent.text
+            score += 0.2
             break
+
+    data["classification_confidence"] = score
 
     return data
 
@@ -106,7 +118,7 @@ async def ocr(file: UploadFile = File(...)):
         "file_id": file_id,
         "file_name": file.filename,
         "ocr_confidence": ocr_conf,
-        "classification_confidence": 0.85,
+        "classification_confidence": fields.get("classification_confidence", 0),
         "fields": {
             "siret": fields.get("siret"),
             "montant_ht": fields.get("montant_ht"),
