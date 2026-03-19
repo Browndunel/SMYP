@@ -51,7 +51,7 @@ def extract_fields(text):
     if tva:
         data["tva_rate"] = float(tva.group().replace("%", ""))
 
-    # Fournisseur via NLP
+    # Fournisseur
     doc = nlp(clean_text)
     for ent in doc.ents:
         if ent.label_ == "ORG":
@@ -62,6 +62,7 @@ def extract_fields(text):
 
 def run_ocr(file_path, content_type):
     text = ""
+    confidences = []
 
     if content_type == "application/pdf":
         images = convert_from_path(file_path)
@@ -69,12 +70,21 @@ def run_ocr(file_path, content_type):
         for img in images:
             img = img.convert("RGB")
             result = reader.readtext(np.array(img))
-            text += " ".join([r[1] for r in result]) + "\n"
+
+            for r in result:
+                text += r[1] + " "
+                confidences.append(r[2])
+
     else:
         result = reader.readtext(file_path)
-        text = " ".join([r[1] for r in result])
 
-    return text
+        for r in result:
+            text += r[1] + " "
+            confidences.append(r[2])
+
+    ocr_conf = sum(confidences) / len(confidences) if confidences else 0
+
+    return text, ocr_conf
 
 @app.post("/ocr")
 async def ocr(file: UploadFile = File(...)):
@@ -86,7 +96,7 @@ async def ocr(file: UploadFile = File(...)):
         shutil.copyfileobj(file.file, buffer)
 
     # OCR
-    text = run_ocr(file_path, file.content_type)
+    text, ocr_conf = run_ocr(file_path, file.content_type)
 
     # Extraction
     fields = extract_fields(text)
@@ -96,8 +106,8 @@ async def ocr(file: UploadFile = File(...)):
         "file_id": file_id,
         "file_name": file.filename,
         "doc_type": "FACTURE",
-        "ocr_confidence": 0.90,  # (mock pour l'instant)
-        "classification_confidence": 0.85,  # (mock)
+        "ocr_confidence": ocr_conf,
+        "classification_confidence": 0.85,
         "fields": {
             "siret": fields.get("siret"),
             "montant_ht": fields.get("montant_ht"),
