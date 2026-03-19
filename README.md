@@ -6,9 +6,16 @@ Python - FastAPI
 OCR - EasyOCR
 NER - SpaCy
 
+## Dépendances
+
+```bash
+pip install --user fastapi uvicorn easyocr spacy python-multipart pillow pdf2image
+```
+
 ## Lancer l'API :
 ```bash
-python -m uvicorn main:app --reload
+cd ocr
+python -m uvicorn ap:app --reload
 ```
 
 
