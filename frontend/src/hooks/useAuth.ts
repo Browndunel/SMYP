@@ -1,7 +1,13 @@
 import { useState } from 'react'
 import { useAuthStore } from '../store/auth.store'
 import { authService } from '../services/auth.service'
-import axios from 'axios'
+
+function extractMessage(err: unknown, fallback: string): string {
+  if (typeof err === 'object' && err !== null && 'message' in err) {
+    return String((err as Record<string, unknown>).message)
+  }
+  return fallback
+}
 
 export function useAuth() {
   const { token, isLoggedIn, login, logout } = useAuthStore()
@@ -16,11 +22,7 @@ export function useAuth() {
       login(token)
       return true
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message ?? 'Identifiants incorrects')
-      } else {
-        setError('Une erreur est survenue')
-      }
+      setError(extractMessage(err, 'Identifiants incorrects'))
       return false
     } finally {
       setIsLoading(false)
@@ -35,11 +37,7 @@ export function useAuth() {
       login(token)
       return true
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message ?? 'Erreur lors de la création du compte')
-      } else {
-        setError('Une erreur est survenue')
-      }
+      setError(extractMessage(err, 'Erreur lors de la création du compte'))
       return false
     } finally {
       setIsLoading(false)

@@ -1,7 +1,13 @@
 import { useState } from 'react'
 import { documentsService } from '../services/documents.service'
 import { useDocumentsStore } from '../store/documents.store'
-import axios from 'axios'
+
+function extractMessage(err: unknown, fallback: string): string {
+  if (typeof err === 'object' && err !== null && 'message' in err) {
+    return String((err as Record<string, unknown>).message)
+  }
+  return fallback
+}
 
 export function useUpload() {
   const [files, setFiles] = useState<File[]>([])
@@ -12,8 +18,7 @@ export function useUpload() {
   const addFiles = (newFiles: File[]) => {
     setFiles((prev) => {
       const existing = new Set(prev.map((f) => f.name))
-      const filtered = newFiles.filter((f) => !existing.has(f.name))
-      return [...prev, ...filtered]
+      return [...prev, ...newFiles.filter((f) => !existing.has(f.name))]
     })
   }
 
@@ -33,11 +38,7 @@ export function useUpload() {
       setFiles([])
       return true
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message ?? 'Erreur lors de l\'envoi')
-      } else {
-        setError('Erreur lors de l\'envoi des documents')
-      }
+      setError(extractMessage(err, "Erreur lors de l'envoi des documents"))
       return false
     } finally {
       setIsUploading(false)

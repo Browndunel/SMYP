@@ -1,28 +1,33 @@
-type BadgeVariant = 'ok' | 'suspect' | 'frauduleux' | 'default'
+import * as React from 'react'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { cn } from '../../lib/utils'
 
-interface BadgeProps {
-  variant?: BadgeVariant
-  children: React.ReactNode
-  className?: string
+const badgeVariants = cva(
+  'inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.06em] transition-colors',
+  {
+    variants: {
+      variant: {
+        default: 'border-transparent bg-primary text-primary-foreground',
+        secondary: 'border-transparent bg-secondary text-secondary-foreground',
+        destructive: 'border-transparent bg-destructive text-destructive-foreground',
+        outline: 'text-foreground',
+        ok: 'border-emerald-200 bg-emerald-100 text-emerald-700',
+        suspect: 'border-amber-200 bg-amber-100 text-amber-700',
+        frauduleux: 'border-red-200 bg-red-100 text-red-700',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+)
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
+  return <div className={cn(badgeVariants({ variant }), className)} {...props} />
 }
 
-const variantClasses: Record<BadgeVariant, string> = {
-  ok: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  suspect: 'bg-amber-100 text-amber-700 border-amber-200',
-  frauduleux: 'bg-red-100 text-red-700 border-red-200',
-  default: 'bg-muted text-muted-foreground border-border',
-}
-
-export function Badge({ variant = 'default', children, className = '' }: BadgeProps) {
-  return (
-    <span
-      className={[
-        'inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.06em]',
-        variantClasses[variant],
-        className,
-      ].join(' ')}
-    >
-      {children}
-    </span>
-  )
-}
+export { Badge, badgeVariants }

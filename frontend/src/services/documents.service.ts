@@ -1,26 +1,39 @@
-import { api } from './api'
+import { ApiService } from './api'
+import { useAuthStore } from '../store/auth.store'
 import type { Document } from '../types'
+
+const API_URL = import.meta.env.VITE_API_URL
+
+function getToken(): string | null {
+  return useAuthStore.getState().token
+}
 
 export const documentsService = {
   async getDocuments(): Promise<Document[]> {
-    const { data } = await api.get<Document[]>('/api/documents')
-    return data
+    return ApiService.get<Document[]>('/api/documents', getToken())
   },
 
   async uploadDocuments(files: File[]): Promise<Document[]> {
+    const token = getToken()
     const results: Document[] = []
     for (const file of files) {
       const formData = new FormData()
       formData.append('uploadedDocument', file)
-      const { data } = await api.post<Document>('/api/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const headers: Record<string, string> = {}
+      if (token) headers['Authorization'] = `Bearer ${token}`
+      const res = await fetch(`${API_URL}/api/upload`, {
+        method: 'POST',
+        headers,
+        body: formData,
       })
-      results.push(data)
+      const data = await res.json()
+      if (!res.ok) throw data
+      results.push(data as Document)
     }
     return results
   },
 
   async deleteDocument(id: string): Promise<void> {
-    await api.delete(`/api/documents/${id}`)
+    return ApiService.delete<void>(`/api/documents/${id}`, getToken())
   },
 }

@@ -155,7 +155,7 @@ export default function Conformite() {
                 key={f}
                 onClick={() => setFilter(f)}
                 className={[
-                  'px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
+                  'px-3 py-1.5 rounded-md text-xs cursor-pointer font-medium transition-colors',
                   filter === f
                     ? 'bg-background text-foreground shadow-sm'
                     : 'text-muted-foreground hover:text-foreground',

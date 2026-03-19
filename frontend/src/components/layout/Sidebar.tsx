@@ -26,16 +26,16 @@ export function Sidebar({ onUploadClick }: SidebarProps) {
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2 px-4 py-4 border-b border-sidebar-border">
-        <div className="w-7 h-7 rounded-lg bg-sidebar-primary flex items-center justify-center flex-shrink-0">
-          <span className="text-sidebar-primary-foreground text-xs font-semibold">S</span>
+      <div className="flex items-center gap-1 px-4 py-4 border-b border-sidebar-border">
+        <div className="w-14 h-7 rounded-lg flex items-center justify-center">
+        <img src="/SMYP-logo.png" alt="SMYP" className="size-24 object-contain" />
         </div>
         <span className="font-medium tracking-[-0.02em] text-sidebar-foreground text-sm">SMYP</span>
       </div>
 
       <div className="p-3 border-b border-sidebar-border">
         <Button
-          variant="primary"
+          variant="default"
           size="sm"
           className="w-full"
           onClick={() => {
@@ -59,7 +59,7 @@ export function Sidebar({ onUploadClick }: SidebarProps) {
                 setMobileOpen(false)
               }}
               className={[
-                'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-left',
+                'w-full flex items-center gap-2.5 px-3 py-2 cursor-pointer rounded-lg text-sm font-medium transition-colors text-left',
                 active
                   ? 'bg-sidebar-accent text-sidebar-primary'
                   : 'text-sidebar-foreground hover:bg-sidebar-accent/50',
