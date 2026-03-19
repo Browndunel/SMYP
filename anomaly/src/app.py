@@ -98,6 +98,6 @@ async def health():
 
 if __name__ == "__main__":
     import uvicorn
-    print("Anomaly service running on http://localhost:8000")
-    print("Swagger UI: http://localhost:8000/docs")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    print("Anomaly service running on http://localhost:8002")
+    print("Swagger UI: http://localhost:8002/docs")
+    uvicorn.run(app, host="0.0.0.0", port=8002)

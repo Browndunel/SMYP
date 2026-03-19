@@ -1,2 +1,4 @@
 /anomaly/.env
-.lh/
+.lh/__pycache__/
+*.pyc
+*.pyo
