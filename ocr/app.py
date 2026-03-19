@@ -105,7 +105,6 @@ async def ocr(file: UploadFile = File(...)):
     return {
         "file_id": file_id,
         "file_name": file.filename,
-        "doc_type": "FACTURE",
         "ocr_confidence": ocr_conf,
         "classification_confidence": 0.85,
         "fields": {
@@ -114,7 +113,6 @@ async def ocr(file: UploadFile = File(...)):
             "montant_ttc": fields.get("montant_ttc"),
             "tva_rate": fields.get("tva_rate"),
             "date_emission": fields.get("date_emission"),
-            "date_expiration": None,
             "iban": fields.get("iban"),
             "fournisseur": fields.get("fournisseur"),
         }
