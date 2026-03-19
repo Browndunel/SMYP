@@ -10,23 +10,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
-function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { token } = useAuthStore()
-  if (token) return <Navigate to="/dashboard" replace />
-  return <>{children}</>
-}
-
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route
           path="/"
-          element={
-            <PublicRoute>
-              <Landing />
-            </PublicRoute>
-          }
+          element={<Landing />}
         />
         <Route
           path="/dashboard"

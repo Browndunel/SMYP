@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { FileText, ShieldCheck, LogOut, Upload, Menu, X } from 'lucide-react'
 import { useAuthStore } from '../../store/auth.store'
 import { Button } from '../ui/Button'
@@ -26,13 +26,14 @@ export function Sidebar({ onUploadClick }: SidebarProps) {
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
-      <div className="flex items-center gap-1 px-4 py-4 border-b border-sidebar-border">
-        <div className="w-14 h-7 rounded-lg flex items-center justify-center">
-        <img src="/SMYP-logo.png" alt="SMYP" className="size-24 object-contain" />
+      <Link to="/">
+        <div className="flex items-center gap-1 px-4 py-4 border-b border-sidebar-border">
+          <div className="w-14 h-7 rounded-lg flex items-center justify-center">
+            <img src="/SMYP-logo.png" alt="SMYP" className="size-24 object-contain" />
+          </div>
+          <span className="font-semibold tracking-[-0.02em] text-sidebar-foreground text-sm">SMYP</span>
         </div>
-        <span className="font-medium tracking-[-0.02em] text-sidebar-foreground text-sm">SMYP</span>
-      </div>
-
+      </Link>
       <div className="p-3 border-b border-sidebar-border">
         <Button
           variant="default"
