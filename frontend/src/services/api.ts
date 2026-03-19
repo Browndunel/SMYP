@@ -1,70 +1,57 @@
-const DEFAULT_API_URL = 'http://localhost:5000'
+import type { SignInResponse } from '../types'
 
-export const API_URL = (import.meta.env.VITE_API_URL || DEFAULT_API_URL).replace(/\/$/, '')
+export const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '')
 
-const getHeaders = (token?: string | null): Record<string, string> => {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-  if (token) headers['Authorization'] = `Bearer ${token}`
-  return headers
+async function fetcher<T>(path: string, options?: RequestInit): Promise<T> {
+  const isFormData = options?.body instanceof FormData
+
+  const res = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers: {
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+      ...options?.headers,
+    },
+  })
+
+  if (res.status === 204) return undefined as T
+
+  const body = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(body.message ?? body.error ?? `Erreur ${res.status}`)
+
+  return body as T
 }
 
-const extractApiErrorMessage = (data: unknown): string => {
-  if (typeof data === 'object' && data !== null) {
-    if ('message' in data && typeof data.message === 'string') {
-      return data.message
-    }
-
-    if ('error' in data && typeof data.error === 'string') {
-      return data.error
-    }
-  }
-
-  return 'Une erreur est survenue'
-}
-
-const handleResponse = async <T>(response: Response): Promise<T> => {
-  const data = await response.json()
-
-  if (!response.ok) {
-    throw {
-      message: extractApiErrorMessage(data),
-      status: response.status,
-      data,
-    }
-  }
-
-  return data as T
-}
-
-export const ApiService = {
-  get: async <T>(path: string, token?: string | null): Promise<T> => {
-    const res = await fetch(`${API_URL}${path}`, { headers: getHeaders(token) })
-    return handleResponse<T>(res)
-  },
-
-  post: async <T>(path: string, body: unknown, token?: string | null): Promise<T> => {
-    const res = await fetch(`${API_URL}${path}`, {
+export const api = {
+  signIn: (email: string, password: string) =>
+    fetcher<SignInResponse | string>('/api/sign-in', {
       method: 'POST',
-      headers: getHeaders(token),
-      body: JSON.stringify(body),
+      body: JSON.stringify({ email, password }),
+    }),
+
+  signUp: (email: string, password: string) =>
+    fetcher<SignInResponse | string>('/api/sign-up', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    }),
+
+  getDocuments: (token: string) =>
+    fetcher<unknown[]>('/api/documents', {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+
+  uploadDocument: (file: File, token: string) => {
+    const formData = new FormData()
+    formData.append('uploadedDocument', file)
+    return fetcher<unknown>('/api/upload', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
     })
-    return handleResponse<T>(res)
   },
 
-  patch: async <T>(path: string, body: unknown, token?: string | null): Promise<T> => {
-    const res = await fetch(`${API_URL}${path}`, {
-      method: 'PATCH',
-      headers: getHeaders(token),
-      body: JSON.stringify(body),
-    })
-    return handleResponse<T>(res)
-  },
-
-  delete: async <T>(path: string, token?: string | null): Promise<T> => {
-    const res = await fetch(`${API_URL}${path}`, {
+  deleteDocument: (id: string, token: string) =>
+    fetcher<void>(`/api/documents/${id}`, {
       method: 'DELETE',
-      headers: getHeaders(token),
-    })
-    return handleResponse<T>(res)
-  },
+      headers: { Authorization: `Bearer ${token}` },
+    }),
 }

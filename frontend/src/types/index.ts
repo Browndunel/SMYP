@@ -1,20 +1,34 @@
+export type DocumentPrimitive = string | number | boolean | null
+
+export type DocumentDataValue =
+  | DocumentPrimitive
+  | DocumentDataValue[]
+  | { [key: string]: DocumentDataValue | undefined }
+
+export interface ExtractedEntity {
+  text?: string
+  label?: string
+  [key: string]: DocumentDataValue | undefined
+}
+
+export interface ExtractedData {
+  filename?: string
+  text?: string
+  entities?: ExtractedEntity[]
+  [key: string]: DocumentDataValue | undefined
+}
+
 export interface Document {
   id: string
   name: string
   date: string
-  type: 'facture' | 'devis' | 'attestation_urssaf' | 'kbis' | 'rib'
+  type: 'facture' | 'devis' | 'attestation_urssaf' | 'kbis' | 'rib' | 'autre'
   status: 'OK' | 'suspect' | 'frauduleux'
   anomalies: string[]
-  fields: {
-    siret?: string
-    montant_ht?: number
-    montant_ttc?: number
-    tva_rate?: number
-    date_emission?: string
-    date_expiration?: string
-    iban?: string
-    fournisseur?: string
-  }
+  fields: Record<string, DocumentDataValue | undefined>
+  nomFichierDOrigine?: string
+  dateTraitement?: string
+  donneesExtraites?: ExtractedData
 }
 
 export interface AuthStore {

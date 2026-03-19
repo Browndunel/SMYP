@@ -15,6 +15,7 @@ const typeLabels: Record<Document['type'], string> = {
   attestation_urssaf: 'URSSAF',
   kbis: 'Kbis',
   rib: 'RIB',
+  autre: 'Autre',
 }
 
 export function DocumentCard({ document, selected, onClick, onDelete }: DocumentCardProps) {
