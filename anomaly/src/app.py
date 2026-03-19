@@ -5,7 +5,7 @@ lance l'analyse (règles métier + ML) et renvoie le verdict.
 Le résultat est aussi poussé sur MinIO dans le dossier curated/.
 """
 
-import sys, io, json
+import sys, io, json, csv
 from pathlib import Path
 
 # pour que les imports marchent même si on lance le fichier directement
@@ -15,6 +15,9 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from fraud_detector import detect
 from minio_client import client, BUCKET
+
+# chemin vers le CSV d'entraînement (on y ajoute les factures clean)
+CSV_PATH = Path(__file__).parent.parent / "data" / "mes_factures.csv"
 
 
 app = FastAPI(
@@ -88,6 +91,18 @@ async def validate(req: ValidateRequest):
     key = f"curated/{result['file_id']}.json"
     client.put_object(BUCKET, key, io.BytesIO(payload), len(payload),
                       content_type="application/json")
+
+    # si la facture est clean, on l'ajoute au CSV pour enrichir le modèle
+    if result["status"] == "OK" and req.doc_type == "FACTURE":
+        f = req.fields
+        if f.siret and f.montant_ht is not None:
+            with open(CSV_PATH, "a", newline="") as csvfile:
+                csv.writer(csvfile).writerow([
+                    f.siret, f.montant_ht,
+                    f.montant_ttc or round(f.montant_ht * (1 + (f.tva_rate or 20.0) / 100), 2),
+                    f.tva_rate or 20.0,
+                    req.ocr_confidence,
+                ])
 
     return result
 
