@@ -40,6 +40,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(cors());
 app.use(express.json());
 
+app.get("/health", (req, res) => res.json({ status: "ok" }));
+
 app.use("/api", require("./src/routes/documents.route"));
 app.use("/api", require("./src/routes/auth.route"));
 

@@ -77,7 +77,7 @@ services:
       dockerfile: Dockerfile
     container_name: smyp-backend
     ports:
-      - "5000:5000"
+      - "5001:5001"
     environment:
       - MINIO_ENDPOINT=${MINIO_ENDPOINT}
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
@@ -108,7 +108,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/api-docs/"]
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -123,7 +123,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_API_URL=http://localhost:5000
+      - VITE_API_URL=http://localhost:5001
     volumes:
       - ./frontend:/app
       - /app/node_modules

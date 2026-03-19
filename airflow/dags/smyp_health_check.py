@@ -15,8 +15,8 @@ log = logging.getLogger(__name__)
 
 SERVICES = {
     "ocr-service":     os.getenv("OCR_SERVICE_URL",     "http://ocr-service:8001")     + "/health",
-    "anomaly-service": os.getenv("ANOMALY_SERVICE_URL", "http://anomaly-service:8002") + "/health",
-    "backend":         os.getenv("BACKEND_URL",         "http://backend:5000")         + "/health",
+    "anomaly-service": os.getenv("ANOMALY_SERVICE_URL", "http://anomaly-service:8000") + "/health",
+    "backend":         os.getenv("BACKEND_URL",         "http://backend:5001")         + "/health",
 }
 
 default_args = {

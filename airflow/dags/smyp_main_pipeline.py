@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 # ── Config depuis variables d'environnement ─────────────────
 OCR_SERVICE_URL      = os.getenv("OCR_SERVICE_URL",      "http://ocr-service:8001")
 ANOMALY_SERVICE_URL  = os.getenv("ANOMALY_SERVICE_URL",  "http://anomaly-service:8002")
-BACKEND_URL          = os.getenv("BACKEND_URL",          "http://backend:5000")
+BACKEND_URL          = os.getenv("BACKEND_URL",          "http://backend:5001")
 MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT", "josue-unreceiving-toshiko.ngrok-free.dev")
 MINIO_SECURE   = os.getenv("MINIO_SECURE", "true").lower() == "true"
 
