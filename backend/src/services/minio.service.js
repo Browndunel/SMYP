@@ -14,6 +14,7 @@ const uploadFile = async (fileBuffer, originalName, mimetype) => {
   try {
     const exists = await minioClient.bucketExists(bucketName);
     if (!exists) {
+      console.error("Le bucket minio n'existe pas");
       return {
         error: true,
         data: "Le bucket minio n'existe pas",
