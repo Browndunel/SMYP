@@ -1,5 +1,11 @@
 import React, { useState, useCallback } from "react"
-import { FileText, Upload, User, Star, ChevronDown, ArrowLeft, LogOut, X, Paperclip } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { useToast } from "@/hooks/use-toast"
+import {
+    FileText, Upload, User, Star, ChevronDown,
+    ArrowLeft, LogOut, X, Paperclip
+} from "lucide-react"
 
 // Types
 interface Document {

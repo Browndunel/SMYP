@@ -3,43 +3,54 @@ export default {
     content: [
         "./index.html",
         "./src/**/*.{js,ts,jsx,tsx}",
+        "./app/**/*.{ts,tsx}",
     ],
     theme: {
         extend: {
             colors: {
-                // Mapping complet de tes variables CSS
-                border: "oklch(var(--border) / <alpha-value>)",
-                input: "oklch(var(--input) / <alpha-value>)",
-                ring: "oklch(var(--ring) / <alpha-value>)",
-                background: "oklch(var(--background) / <alpha-value>)",
-                foreground: "oklch(var(--foreground) / <alpha-value>)",
+                // On retire le "hsl()" car tes variables sont déjà au format oklch(...) dans le CSS
+                border: "var(--border)",
+                input: "var(--input)",
+                ring: "var(--ring)",
+                background: "var(--background)",
+                foreground: "var(--foreground)",
                 primary: {
-                    DEFAULT: "oklch(var(--primary) / <alpha-value>)",
-                    foreground: "oklch(var(--primary-foreground) / <alpha-value>)",
+                    DEFAULT: "var(--primary)",
+                    foreground: "var(--primary-foreground)",
                 },
                 secondary: {
-                    DEFAULT: "oklch(var(--secondary) / <alpha-value>)",
-                    foreground: "oklch(var(--secondary-foreground) / <alpha-value>)",
+                    DEFAULT: "var(--secondary)",
+                    foreground: "var(--secondary-foreground)",
                 },
                 destructive: {
-                    DEFAULT: "oklch(var(--destructive) / <alpha-value>)",
-                    foreground: "oklch(var(--destructive-foreground) / <alpha-value>)",
+                    DEFAULT: "var(--destructive)",
+                    foreground: "var(--destructive-foreground)",
                 },
                 muted: {
-                    DEFAULT: "oklch(var(--muted) / <alpha-value>)",
-                    foreground: "oklch(var(--muted-foreground) / <alpha-value>)",
+                    DEFAULT: "var(--muted)",
+                    foreground: "var(--muted-foreground)",
                 },
                 accent: {
-                    DEFAULT: "oklch(var(--accent) / <alpha-value>)",
-                    foreground: "oklch(var(--accent-foreground) / <alpha-value>)",
+                    DEFAULT: "var(--accent)",
+                    foreground: "var(--accent-foreground)",
                 },
                 popover: {
-                    DEFAULT: "oklch(var(--popover) / <alpha-value>)",
-                    foreground: "oklch(var(--popover-foreground) / <alpha-value>)",
+                    DEFAULT: "var(--popover)",
+                    foreground: "var(--popover-foreground)",
                 },
                 card: {
-                    DEFAULT: "oklch(var(--card) / <alpha-value>)",
-                    foreground: "oklch(var(--card-foreground) / <alpha-value>)",
+                    DEFAULT: "var(--card)",
+                    foreground: "var(--card-foreground)",
+                },
+                sidebar: {
+                    DEFAULT: "var(--sidebar)",
+                    foreground: "var(--sidebar-foreground)",
+                    primary: "var(--sidebar-primary)",
+                    'primary-foreground': "var(--sidebar-primary-foreground)",
+                    accent: "var(--sidebar-accent)",
+                    'accent-foreground': "var(--sidebar-accent-foreground)",
+                    border: "var(--sidebar-border)",
+                    ring: "var(--sidebar-ring)",
                 },
             },
             borderRadius: {
@@ -49,15 +60,25 @@ export default {
             },
             animation: {
                 'spin-slow': 'spin 3s linear infinite',
-                'marquee': 'marquee 8s linear infinite', // Ajout de l'animation pour ton titre
+                'marquee': 'marquee 8s linear infinite',
+                "accordion-down": "accordion-down 0.2s ease-out",
+                "accordion-up": "accordion-up 0.2s ease-out",
             },
             keyframes: {
                 marquee: {
                     '0%': { transform: 'translateX(-100%)' },
                     '100%': { transform: 'translateX(100%)' },
                 },
+                "accordion-down": {
+                    from: { height: "0" },
+                    to: { height: "var(--radix-accordion-content-height)" },
+                },
+                "accordion-up": {
+                    from: { height: "var(--radix-accordion-content-height)" },
+                    to: { height: "0" },
+                },
             },
         },
     },
-    plugins: [],
+    plugins: [require("tailwindcss-animate")],
 }
