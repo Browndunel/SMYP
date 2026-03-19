@@ -13,8 +13,13 @@ export interface ExtractedEntity {
 
 export interface ExtractedData {
   filename?: string;
+  file_name?: string;
+  file_id?: string;
+  ocr_confidence?: number;
+  classification_confidence?: number;
   text?: string;
   entities?: ExtractedEntity[];
+  fields?: Record<string, DocumentDataValue | undefined>;
   [key: string]: DocumentDataValue | undefined;
 }
 

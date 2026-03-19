@@ -310,7 +310,10 @@ export function DocumentDetail({ document }: DocumentDetailProps) {
       label: "nomFichierDOrigine",
       value: document.nomFichierDOrigine ?? document.name,
     },
-    { label: "filename", value: document.donneesExtraites?.filename },
+    {
+      label: "filename",
+      value: document.donneesExtraites?.file_name ?? document.donneesExtraites?.filename,
+    },
     {
       label: "dateTraitement",
       value: document.dateTraitement ?? document.date,
