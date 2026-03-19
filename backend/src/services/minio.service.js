@@ -21,7 +21,7 @@ const uploadFile = async (fileBuffer, originalName, mimetype) => {
       };
     }
 
-    const uniqueFileName = `${Date.now()}-${originalName.replace(/\s+/g, "_")}`;
+    const uniqueFileName = `raw/${Date.now()}-${originalName.replace(/\s+/g, "_")}`;
 
     const metaData = {
       "Content-Type": mimetype,

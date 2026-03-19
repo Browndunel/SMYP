@@ -7,7 +7,7 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType) => {
   // Renvoi les document à l'OCR et attend la réponse
 
   const form = new FormData();
-  form.append("document", fileBuffer, originalFileName);
+  form.append("file", fileBuffer, originalFileName);
 
   const ocrApiUrl = process.env.OCR_API_URL + "/ocr";
 
@@ -27,6 +27,8 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType) => {
 
   const jsonRecu = response.data;
 
+  const minioFileName = null;
+
   // Enregistre le document dans minIO
   try {
     const result = await minioService.uploadFile(
@@ -37,6 +39,7 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType) => {
     if (result.error == true) {
       return result;
     }
+    minioFileName = result.data;
   } catch (error) {
     return {
       error: true,
@@ -46,13 +49,9 @@ exports.Upload = async (fileBuffer, originalFileName, mimeType) => {
   }
 
   // Sauvegarde dans MongoDB
-  // const jsonRecu = {
-  //   type: "Facture",
-  //   date: "12/12/23",
-  //   createur: "Jean Dupont",
-  // };
   const nouvelleEntree = new Document({
     nomFichierDOrigine: originalFileName,
+    nomFichierMinIO: minioFileName,
     donneesExtraites: jsonRecu,
   });
   await nouvelleEntree.save();
