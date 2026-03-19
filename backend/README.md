@@ -1,3 +1,7 @@
+# Documentation API
+
+Une [documentation swagger](http://localhost:5000/api-docs/) est disponible
+
 # API avec Docker
 
 ## Prérequis
